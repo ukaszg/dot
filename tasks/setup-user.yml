@@ -12,6 +12,7 @@
       user:
         name: uki
         shell: /usr/bin/fish
+      become: true
 
     - name: Add me to a docker group
       user:

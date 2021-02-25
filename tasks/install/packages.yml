@@ -14,11 +14,6 @@
       apt_repository:
         repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
 
-    - name: Install/update vim-plug for neovim
-      shell: 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-      args:
-          warn: no # module: fetch doesn't dig environment variables
-
     - name: Install my packages
       ignore_errors: yes
       apt:
@@ -34,9 +29,13 @@
           - containerd.io
           - cmake
           - curl
+          - debhelper
+          - dh-make-golang
+          - dpkg-dev
           - docker-ce
           - docker-ce-cli
           - docker-compose
+          - fakeroot
           - fd-find
           - firefox
           - fish
@@ -64,6 +63,7 @@
           - i3xrocks-time
           - i3xrocks-volume
           - jq
+          - lintian
           - libacl1-dev
           - libdbus-1-dev
           - libgconf2-dev
@@ -112,3 +112,14 @@
           - xfonts-terminus-dos
           - xfonts-terminus-oblique
           - xorg-dev
+
+    - name: Install/update vim-plug for neovim
+      shell: |
+          DIR="${HOME}/.local/share/nvim/site/autoload/"
+          mkdir -p "${DIR}"
+          curl -fLo "${DIR}/plug.vim" https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+          [ -f "${DIR}/plug.vim" ] && exit 0 || exit 1
+      args:
+        creates: ~/.local/share/nvim/site/autoload/plug.vim
+        warn: false
+      become: false
