@@ -18,7 +18,7 @@
     - name: Create missing hidden dirs
       shell: "mkdir -p $(dirname {{ item['path']|replace(hidden_dir, home+'.') }})"
       loop: "{{ hidden_files.files }}"
-      # todo: dodac state=directory
+      warn: false
 
     - name: Link config files to home
       file:
@@ -36,6 +36,7 @@
     - name: Create missing regular dirs
       shell: "mkdir -p $(dirname {{ item['path']|replace(files_dir, home) }})"
       loop: "{{ files.files }}"
+      warn: false
 
     - name: Link regular files to home
       file:
