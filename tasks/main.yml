@@ -1,6 +1,6 @@
 ---
 - import_playbook: link-configuration.yml
-- import_playbook: setup-user.yml
 - import_playbook: install/all.yml
+- import_playbook: setup-user.yml
 - import_playbook: gsettings.yml
 - import_playbook: download-emacs-sources.yml
