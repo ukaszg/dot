@@ -1,0 +1,40 @@
+---
+- hosts: all
+  module_defaults:
+    npm:
+      path: /home/uki/.local/
+      production: yes
+      state: latest
+  tasks:
+    - name: Install formatter prettier
+      npm: name=prettier
+
+    - name: Install linter stylelint
+      npm: name=stylelint
+
+    - name: Install linter textlint
+      npm: name=textlint
+
+    - name: Install linter marked
+      npm: name=marked
+
+    - name: Install CSS LSP
+      npm: name=vscode-css-languageserver-bin
+
+    - name: Install JavaScript LSP
+      npm: name=javascript-typescript-langserver
+
+    - name: Install Bash LSP
+      npm: name=bash-language-server
+
+    - name: Install Html LSP
+      npm: name=vscode-html-languageserver-bin
+
+    - name: Install Yaml LSP
+      npm: name=yaml-language-server
+
+    - name: Install JSON LSP
+      npm: name=vscode-json-languageserver-bin
+
+    - name: Install Dockerfile LSP
+      npm: name=dockerfile-language-server-nodejs

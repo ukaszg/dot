@@ -1,0 +1,20 @@
+# -*- mode: yaml -*-
+# https://github.com/prettier/eslint-config-prettier
+# https://prettier.io/docs/en/
+# @prettier/plugin-xml
+# @prettier/plugin-php
+tabWidth: 2
+printWidth: 200
+useTabs: false
+semi: false
+singleQuote: true
+jsxSingleQuote: true
+trailingComma: "none"
+bracketSpacing: true
+jsxBracketSameLine: false
+arrowParens: "always"
+overrides:
+  - files: ["*.html", "*.htm"]
+    options:
+      tabWidth: 4
+      singleQuote: false

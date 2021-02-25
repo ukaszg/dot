@@ -1,0 +1,45 @@
+#+TODO: TODO TODOW IDEA README | DONE FIZZLED
+
+* Tasks
+** TODO Go-oracle
+   paczka do analizy kodu go, do sprawdzenia
+   Opis m.in. oracla na blogu :: [[http://yousefourabi.com/blog/2014/05/emacs-for-go/]]
+
+   Instalacja oracla
+   #+BEGIN_SRC sh
+     go get code.google.com/p/go.tools/cmd/oracle
+   #+END_SRC
+
+   [[http://code.google.com/p/go.tools/cmd/oracle/oracle.el]]
+   #+BEGIN_SRC emacs-lisp
+     (quelpa '(oracle :url "https://code.google.com/p/go.tools/"
+                         :fetcher hg
+                         :files ("cmd/oracle/oracle.el")))
+
+     (setq go-oracle-command "~/src/go/bin/oracle")
+     (add-hook 'go-mode-hook 'go-oracle-mode)
+   #+END_SRC
+** TODO Linum mode do podswietlania evilowych markerow
+   [2014-05-21 śro]
+   [[file:~/.local/share/emacs/24.4.50/lisp/linum.el.gz::(overlay-put%20ov%20'linum-str%20str))))][file:~/.local/share/emacs/24.4.50/lisp/linum.el.gz::(overlay-put ov 'linum-str str))))]]
+** TODO DESKTOP MODE FTW@@!!!!
+   [[file:~/.local/share/emacs/24.4.50/lisp/desktop.el.gz]]
+** TODO Mode wyswietlający inny mode read only, gdzie C-mouse-1 pokazuje text propertiesy
+i pozwala na ich edycję, z (interactive "e") pewnie da się to też rozszerzyć na inne elemmenty gui,
+M-click pozwalaloby na edycję property danej zmiennej (w sensie wartości zmiennej a nie bufora wyswietlającego jej nazwę).
+  <2014-11-07 pią>
+** TODO Przejscie z linku z ekranu *Help* powinno zastępować nowym oknem bufor pomocy.
+  <2015-01-31 sob>
+** TODO Dodać traktowanie LPM na linkach helpa tak samo jak ŚPM
+  <2015-01-31 sob>
+** TODO dodać catch errora nie moge przewinąć niżej, z akcją evil-max-scroll-down 
+  <2015-01-31 sob>
+* Ideas
+** IDEA Addon: timer do modeline pokazujący czas od ostatniego save'a
+  <2015-01-31 sob>
+** IDEA Menu dla EWW w header-line, oraz prawoklik, pokazujący eww-toolbar-map
+  <2015-01-31 sob>
+** IDEA Ido suppport for functional completion, syntax tables and command annotation in minibuffer
+  <2015-03-10 wto>
+** IDEA Total recall :: rewrite customized keymaps/vars/etc into local desktop/dirfile/org export/org babel/el file/inline on compilation
+  <2015-03-10 wto>

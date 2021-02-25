@@ -1,0 +1,51 @@
+---
+- hosts: all
+  vars:
+    home: "/home/uki/"
+    hidden_dir: "{{ home }}src/dot/hidden/"
+    files_dir: "{{ home }}src/dot/files/"
+  module_defaults:
+    file:
+      state: link
+      force: yes
+  tasks:
+    - name: Gather a list of config files
+      find:
+        paths: "{{ hidden_dir }}"
+        recurse: yes
+      register: hidden_files
+
+    - name: Create missing hidden dirs
+      shell: "mkdir -p $(dirname {{ item['path']|replace(hidden_dir, home+'.') }})"
+      loop: "{{ hidden_files.files }}"
+      # todo: dodac state=directory
+
+    - name: Link config files to home
+      file:
+        src: "{{ item['path'] }}"
+        dest: "{{ item['path']|replace(hidden_dir, home+'.') }}"
+        state: link
+      loop: "{{ hidden_files.files }}"
+
+    - name: Gather a list of regular files
+      find:
+        paths: "{{ files_dir }}"
+        recurse: yes
+      register: files
+
+    - name: Create missing regular dirs
+      shell: "mkdir -p $(dirname {{ item['path']|replace(files_dir, home) }})"
+      loop: "{{ files.files }}"
+
+    - name: Link regular files to home
+      file:
+        src: "{{ item['path'] }}"
+        dest: "{{ item['path']|replace(files_dir, home) }}"
+        state: link
+      loop: "{{ files.files }}"
+
+    - name: Create directory for nvim backups
+      file:
+        path: ~/.local/share/nvim/backup/
+        state: directory
+        mode: '0750'

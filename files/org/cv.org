@@ -1,0 +1,114 @@
+#+TITLE:  Curriculum Vitae - Łukasz Gruner
+#+OPTIONS: toc:nil H:10 ':t
+#+LANGUAGE: pl
+#+LaTeX_HEADER: \usepackage{fa_orgmode_cv}
+
+* Kontakt
+#+ATTR_HTML: :frame void
+#+ATTR_LATEX: :environment tabular :align rp{0.85\textwidth}
+|     <r> |                                          |
+|  Phone: | +48 667 897 973                          |
+|  Email: | [[mailto:lukasz@gruner.lu][lukasz@gruner.lu]]                         |
+| Gitlab: | https://gitlab.com/users/ukaszg/projects |
+|  Adres: | ul. Cisowa 18, Aleksandrów Łódzki        |
+
+* Doświadczenie Zawodowe
+
+** VII 2014 - XII 2014
+Comp S.A. 
+
+Programista 
+- Rozwój portalu do obsługi kancelarii adwokackiej. 
+
+Używane technologie: 
+JSF, PrimeFaces, Java Beans, Hibernate, Postgresql, Activity. 
+
+** XII 2012 - IX 2013
+	Syndatis sp. z.o.o. - obieg dokumentów w firmie.
+
+	Programista
+	- Utrzymanie i bieżąca obsługa systemów.
+	- Rozwój części wspólnej aplikacji i tworzenie rozwiązań dla nowych klientów.
+
+** V 2012 - X 2012
+	E-CommerceServices - Część grupy EMPIK (empik.com i smyk.pl).
+
+	Programista
+	- Utrzymanie i rozwój obu portali, systemu administracji oraz części wewnętrznych systemów
+	- Technologie używane: Spring Integration, FreeMarker, SmartGWT, Oracle
+
+** XII 2009 – IV 2012
+	EURO-net sp. z.o.o. Największy w polsce dystrybutor sprzętu rtv i agd.
+
+	Analityk Systemowy/Programista
+	- Badanie potrzeb, projekt, specyfikacja i odbiór nowych rozwiązań.
+	- Opieka nad systemami sklepu internetowego oraz Call Center.
+	- Testowanie zmian w systemach, kontrola jakości wdrożeń.
+	- Koordynacja projektów pod moją opieką z resztą systemów.
+
+** VII 2008 - VIII 2009
+	NETSPRINT.PL Sp. z o.o. – rozwiązania wyszukiwawcze i reklama kontekstowa.
+
+	Programista Analityk
+	- Projektowanie oraz tworzenie nowych rozwiązań systemów reklamowych.
+	- Opieka nad wdrożeniami, oraz utrzymanie systemu.
+
+	Zrealizowane projekty
+	- Migracja pojedynczych baz postgresql na architekturę master-slave.
+	- Kod AJAX i oskryptowanie panelu webowego projektu NsContext (jQuery).
+	- Projekt i implementacja generatora zapytań sql dla systemu zarządzania treściami.
+
+** I 2008 - IV 2008
+	AMG.net Firma technologiczno-doradcza, specjalizująca się w budowie i utrzymaniu
+	nowoczesnych rozwiązań informatycznych.
+
+	Programista Tester
+	- Implementacja framework'u do testów funkcjonalnych (keyword driven testing).
+	- Rozwój i utrzymanie testów regresji portalu (testy funkcjonalne).
+
+* Edukacja
+** 2000r - 2002r
+Wyższa Szkoła Kupiecka w Zgierzu
+kierunek: Marketing i Zarządzanie
+
+Zakończone zdobyciem tytułu licencjata z oceną "dobry".
+
+** 2002r - 2004r
+Politechnika Łódzka
+wydział: Fizyka Techniczna i Matematyka Stosowana
+kierunek: Informatyka
+
+Przerwane po trzecim roku studiów.
+
+* Umiejętności
+
+** Technologie jvm
+Java, J2EE, JBpm, Tomcat, Spring, Hibernate, GWT.
+
+** Javascript/CSS
+JQuery, ReactJS, SCSS, SASS.
+
+** Bazy danych
+ PostgreSQL, MySQL, SQLServer, Oracle.
+
+** Systemy operacyjne:
+- BSD & Linux: obsługa, konfiguracja i administracja
+- Windows: obsługa, konfiguracja
+
+** Kontrola wersji
+ svn, mercurial, git, cvs.
+
+** Kompetencje interpersonalne
+Zaangażowanie, kreatywność, wysoko rozwinięte myślenie analityczne, dokładność, dociekliwość.
+
+** inne
+sh/bash, Python3, Lua, Go, Linux, FreeBSD, OpenBSD, C, Lisp (Emacs).
+
+** Języki obce
+- Angielski: bardzo dobra znajomość w mowie i piśmie.
+- Niemiecki: podstawowy (znajomość bierna - zrozumienie i umiejętność czytania).
+
+* Hobby
+  Unix, Emacs, rower, pływanie, majsterkowanie.
+
+

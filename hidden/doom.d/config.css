@@ -1,0 +1,175 @@
+@font-face {
+  font-family: 'Droid Sans Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Droid Sans Mono Regular'), local('DroidSansMono-Regular'), url(Droid_Sans_Mono.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+.title {
+  text-align: center;
+  margin-bottom: 0.2em;
+}
+.subtitle {
+  text-align: center;
+  font-size: medium;
+  font-weight: bold;
+  margin-top: 0;
+}
+.org-right {
+  margin-left: auto;
+  margin-right: 0px;
+  text-align: right;
+}
+.org-left {
+  margin-left: 0px;
+  margin-right: auto;
+  text-align: left;
+}
+.org-center {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+.underline {
+  text-decoration: underline;
+}
+#postamble,
+#preamble {
+  display: none;
+}
+#org-div-home-and-up {
+  font-family: 'Droid Sans Mono';
+  text-align: right;
+  font-size: 80%;
+  white-space: nowrap;
+}
+textarea {
+  font-family: 'Droid Sans Mono';
+  overflow-x: auto;
+}
+.linenr {
+  font-size: smaller;
+}
+.code-highlighted {
+  background-color: #ffff00;
+}
+pre {
+  border: 1px solid #ccc;
+  box-shadow: 3px 3px 3px #eee;
+  padding: 8pt;
+  overflow: auto;
+  margin: 1.2em;
+}
+pre.src {
+  position: relative;
+  overflow: visible;
+  padding-top: 1.2em;
+}
+pre.src:before {
+  display: none;
+  position: absolute;
+  background-color: #ccc;
+  top: -10px;
+  right: 10px;
+  padding: 3px;
+  border: 1px solid #3f3f3f;
+}
+pre.src:hover:before {
+  display: inline;
+}
+caption.t-above {
+  caption-side: top;
+}
+caption.t-bottom {
+  caption-side: bottom;
+}
+.todo,
+.tag,
+pre,
+nav {
+  font-family: 'Droid Sans Mono' !important;
+  font-size: 80% !important;
+}
+nav a {
+  color: #302a3f;
+}
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Droid Sans Mono';
+}
+.tag {
+  color: #3f3f3f;
+  font-family: 'Droid Sans Mono';
+  font-size: 80%;
+  background-color: #e0e0e0;
+  padding: 2px;
+  font-weight: normal;
+}
+pre.src-emacs-lisp:before {
+  content: 'Emacs Lisp';
+}
+pre.src {
+  font-family: 'Droid Sans Mono';
+  background: #3f3f3f;
+  color: #dcdccc;
+}
+pre.src:before {
+  background-color: #4f4f4f !important;
+  color: #f0dfaf !important;
+  font-weight: bold !important;
+  display: inline !important;
+}
+.org-preprocessor {
+  color: #8cd0d3;
+}
+.org-variable-name {
+  color: #f0dfaf;
+}
+.org-string,
+.todo {
+  color: #cc9393;
+}
+.org-type {
+  color: #dfdfbf;
+  font-weight: bold;
+}
+.org-function-name {
+  color: #8cd0d3;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #f0dfaf;
+  font-weight: bold;
+}
+.org-comment {
+  color: #7f9f7f;
+}
+.org-doc,
+.done {
+  color: #afd8af;
+}
+.org-comment-delimiter {
+  color: #708070;
+}
+.org-constant {
+  color: #dca3ac;
+  font-weight: bold;
+}
+.org-builtin {
+  color: #7f9f7f;
+}
+html {
+  background: #e2e2e2;
+  background: -moz-linear-gradient(-45deg, #e2e2e2 0%, #dbdbdb 50%, #d1d1d1 51%, #fefefe 100%);
+  background: -webkit-linear-gradient(-45deg, #e2e2e2 0%, #dbdbdb 50%, #d1d1d1 51%, #fefefe 100%);
+  background: -o-linear-gradient(-45deg, #e2e2e2 0%, #dbdbdb 50%, #d1d1d1 51%, #fefefe 100%);
+  background: -ms-linear-gradient(-45deg, #e2e2e2 0%, #dbdbdb 50%, #d1d1d1 51%, #fefefe 100%);
+  background: linear-gradient(135deg, #e2e2e2 0%, #dbdbdb 50%, #d1d1d1 51%, #fefefe 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e2e2e2', endColorstr='#fefefe',GradientType=1 );
+}

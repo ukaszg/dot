@@ -1,0 +1,647 @@
+#+TITLE: doom-literate-config
+#+DESCRIPTION: Doom Emacs literate config.
+#+LANGUAGE: en
+#+TAGS: package(p) advice(a) disabled(d) hook(h) bind(b) setq(s) noexport(x) popup(u) hack(H)
+#+TODO: TODO
+#+OPTIONS: tags:t tasks:t todo:t inline:t num:nil toc:nil html-style:nil
+#+STARTUP: indent hidestars
+#+PROPERTY: header-args:emacs-lisp :tangle ~/.doom.d/config.el :tangle-mode (identity #o400) :results silent :exports code :lexical yes :mkdirp no
+#+HTML_HEAD: <link rel="preload" href="Droid_Sans_Mono.woff2" as="font" type="font/woff2" />
+#+HTML_HEAD_EXTRA: <link rel="stylesheet" type="text/css" href="config.css" />
+#+EXPORT_FILE_NAME: index.html
+#+LINK_HOME: https://gruner.lu/kasz/
+
+* =*DOOM*=
+** Add file headers
+*** for =config.el=
+#+BEGIN_SRC emacs-lisp
+;;; ~/.doom.d/config.el -*- lexical-binding: t; -*-
+#+END_SRC
+*** and =packages.el=
+#+BEGIN_SRC emacs-lisp :tangle ~/.doom.d/packages.el
+;;; ~/.doom.d/packages.el -*- no-byte-compile: t; lexical-binding: t; -*-
+#+END_SRC
+*** load or create =custom.el=                                          :setq:
+#+BEGIN_SRC emacs-lisp
+(setq! custom-file (expand-file-name "custom.el" doom-private-dir))
+(if (file-exists-p custom-file)
+    (load custom-file)
+  (with-temp-file custom-file
+    (insert ";;; ~/.doom.d/custom.el -*- no-byte-compile: t; lexical-binding: t; -*-\n")))
+#+END_SRC
+*** ask about unsaved customizations
+#+BEGIN_SRC emacs-lisp
+(add-hook! 'kill-emacs-query-functions #'custom-save-all)
+#+END_SRC
+** Modules configuration (init.el)
+#+BEGIN_SRC emacs-lisp :tangle ~/.doom.d/init.el
+;;; ~/.doom.d/init.el -*- lexical-binding: t; -*-
+(doom! :completion (company +childframe) (ivy +icons +prescient)
+       :ui         doom doom-dashboard hl-todo modeline nav-flash ophints treemacs
+                   (popup +all +defaults) vc-gutter vi-tilde-fringe workspaces
+       :editor     (evil +everywhere) file-templates fold format snippets word-wrap
+       :emacs      (dired +icons) (ibuffer +icons) undo vc
+       :term       vterm
+       :checkers   syntax
+       :tools      ansible debugger (docker +lsp) editorconfig (eval +overlay)
+                   (lookup +docsets) (lsp +eglot) magit make prodigy
+       :lang       (cc +lsp) data emacs-lisp (go +lsp) (java +lsp)
+                   (javascript +lsp) (json +lsp) lua markdown org (python +lsp)
+                   (sh +fish +lsp) (web +lsp) (yaml +lsp)
+       :config     literate (default +bindings))
+#+END_SRC
+** *HACKS*
+*** fix defvaralias eldoc-documentation-function                   :setq:hack:
+conflict between eldoc version from emacs28 (installed by doom) and emacs version 27.1
+take note that doom-emacs doesn't yet support emacs version 28
+#+BEGIN_SRC emacs-lisp
+(defvar eldoc-documentation-strategy 'eldoc-documentation-default "Now defvaralias won't fail.")
+#+END_SRC
+* Minor-modes
+** =Builtin= and one-liners
+*** Personal info                                                       :setq:
+#+BEGIN_SRC emacs-lisp
+(setq! user-full-name    "Łukasz Gruner"
+       user-mail-address "lukasz@gruner.lu")
+#+END_SRC
+*** Set theme & font                                            :package:setq:
+~doom-zenburn-theme~ is installed by =:ui doom=
+#+BEGIN_SRC emacs-lisp
+(setq! doom-theme               'doom-zenburn
+       doom-variable-pitch-font "DejaVu Sans:size=14"
+       doom-font                "Terminus:size=18"
+       doom-big-font            "Terminus:size=28")
+#+END_SRC
+*** Define const vars                                                   :setq:
+#+BEGIN_SRC emacs-lisp
+(defconst uki/dotfiles-dir "~/src/dot/" "Dotfiles repository root.")
+
+(defconst uki/ellipsis "…" "Ellipsis.")
+#+END_SRC
+*** Authinfo file                                                       :setq:
+#+BEGIN_SRC emacs-lisp
+(after! auth-source
+  (setq! auth-sources (list (concat uki/dotfiles-dir "hidden/authinfo.gpg"))))
+#+END_SRC
+*** If '.elc' file is outdated load an uncompiled '.el' file instead    :setq:
+#+BEGIN_SRC emacs-lisp
+(setq! load-prefer-newer t)
+#+END_SRC
+*** Make scripts executable on save                                     :hook:
+#+BEGIN_SRC emacs-lisp
+(add-hook 'after-save-hook
+          #'executable-make-buffer-file-executable-if-script-p)
+#+END_SRC
+*** *<mouse-1>* should follow links                                     :setq:
+#+BEGIN_SRC emacs-lisp
+(setq! mouse-1-click-follows-link t)
+#+END_SRC
+*** Enable ~+global-word-wrap-mode~
+#+BEGIN_SRC emacs-lisp
+(after! (:and simple adaptive-wrap)
+  (+global-word-wrap-mode +1))
+#+END_SRC
+*** Only highlight trailing whitespace when coding                 :hook:setq:
+#+BEGIN_SRC emacs-lisp
+(add-hook! '(prog-mode-hook org-mode-hook)
+  (defun uki/set-whitespace-style-to-trailing-space-h ()
+    "Set local value for `whitespace-style'."
+    (setq-local whitespace-style '(face trailing))))
+#+END_SRC
+** Persp-mode
+*** Kill buffers removed from workspace and empty workspaces            :setq:
+#+BEGIN_SRC emacs-lisp
+(after! persp-mode
+  (setq! persp-autokill-buffer-on-remove 'kill
+         persp-autokill-persp-when-removed-last-buffer 'kill))
+#+END_SRC
+** Hl-todo
+*** Setup colors/faces                                                  :setq:
+#+BEGIN_SRC emacs-lisp
+(after! hl-todo
+  (setq! hl-todo-keyword-faces `(("TODO" font-lock-warning-face bold)
+                                 ("FIXME" error bold)
+                                 ("HACK" font-lock-keyword-face bold)
+                                 ("XXX" font-lock-doc-face bold))))
+#+END_SRC
+*** Highlight background                                                :setq:
+#+BEGIN_SRC emacs-lisp
+(after! hl-todo
+  (setq! hl-todo-color-background t))
+#+END_SRC
+** Electric Pair Mode
+*** Disable smartparens                                                 :hook:
+I like electric-pair-mode.
+#+BEGIN_SRC emacs-lisp
+(remove-hook 'doom-first-buffer-hook #'smartparens-global-mode)
+#+END_SRC
+*** Be conservative                                                     :setq:
+#+BEGIN_SRC emacs-lisp
+(after! elec-pair
+  (setq! electric-pair-inhibit-predicate #'electric-pair-conservative-inhibit))
+#+END_SRC
+*** Run in prog-mode derivatives                                        :hook:
+#+BEGIN_SRC emacs-lisp
+(declare-function electric-pair-local-mode "elec-pair" (&optional arg))
+
+(add-hook 'prog-mode-hook #'electric-pair-local-mode)
+#+END_SRC
+** Doom-Modeline
+*** Use icons in graphic mode                                           :setq:
+#+BEGIN_SRC emacs-lisp
+(after! doom-modeline
+  (let ((graphic-p (display-graphic-p)))
+    (setq! doom-modeline-height 20
+           doom-modeline-unicode-fallback t
+           doom-modeline-icon graphic-p
+           doom-modeline-major-mode-icon graphic-p
+           doom-modeline-major-mode-color-icon graphic-p
+           doom-modeline-buffer-state-icon graphic-p
+           doom-modeline-buffer-modification-icon graphic-p
+           doom-modeline-modal-icon graphic-p)))
+#+END_SRC
+*** Don't upscale icon font                                             :setq:
+#+BEGIN_SRC emacs-lisp
+(after! all-the-icons
+  (setq! all-the-icons-scale-factor 1.0))
+#+END_SRC
+*** Truncate ~buffer-file-name~ up to project                           :setq:
+#+BEGIN_SRC emacs-lisp
+(after! doom-modeline
+  (setq! doom-modeline-buffer-file-name-style 'truncate-upto-project))
+#+END_SRC
+** Evil
+*** <C-w M-(direction)> Swap buffers by direction                       :bind:
+#+BEGIN_SRC emacs-lisp
+(defmacro uki/window-swap-action (cmd)
+  "Return defun which invokes `CMD' to switch window and than swaps buffer with previous window."
+  (let ((func-sym (intern (format "uki/swap-buffers-using--%s" cmd))))
+    (if (functionp func-sym)
+        `(quote ,func-sym)
+      `(defun ,func-sym (&optional count)
+         ,(format "Invoke `%s' and swap buffer with window it selects."
+                  (upcase (symbol-name cmd)))
+         (interactive "p")
+         (let ((start-buffer (current-buffer))
+               (start-point  (point))
+               (start-window (selected-window)))
+           (funcall #',cmd (max 1 (or count 0)))
+           (set-window-buffer start-window (current-buffer))
+           (set-window-buffer (selected-window) start-buffer)
+           (goto-char start-point))))))
+
+(map! :after evil :map evil-window-map
+      "M-k"       (uki/window-swap-action evil-window-up)
+      "<M-up>"    (uki/window-swap-action evil-window-up)
+      "M-j"       (uki/window-swap-action evil-window-down)
+      "<M-down>"  (uki/window-swap-action evil-window-down)
+      "M-l"       (uki/window-swap-action evil-window-right)
+      "<M-right>" (uki/window-swap-action evil-window-right)
+      "M-h"       (uki/window-swap-action evil-window-left)
+      "<M-left>"  (uki/window-swap-action evil-window-left))
+#+END_SRC
+*** Always use windows <C-w> bindings                                   :setq:
+#+BEGIN_SRC emacs-lisp
+(after! evil
+  (setq! evil-want-C-w-in-emacs-state t))
+#+END_SRC
+*** Also use arrows for switching windows                               :bind:
+#+BEGIN_SRC emacs-lisp
+(map! :after evil :map evil-window-map
+      "<left>"  #'evil-window-left
+      "<right>" #'evil-window-right
+      "<up>"    #'evil-window-up
+      "<down>"  #'evil-window-down)
+#+END_SRC
+** Ivy
+*** Preview (virtual/file) buffers when switching                       :setq:
+#+BEGIN_SRC emacs-lisp
+(after! ivy
+  (setq! +ivy-buffer-preview 'everything))
+#+END_SRC
+*** Ignore some buffers while switching                                 :setq:
+- =*Messages*= are bound under <SPC h e>
+- =*Org Src...*= automatically displays upon selecting org file
+- =*scratch*= is bound under <SPC x>
+#+BEGIN_SRC emacs-lisp
+(after! ivy
+  (setq! ivy-ignore-buffers '("^ " "^\\*helpful" "^\\*Compile" "^\\*doom\\*$"
+                              "^\\*Messages\\*$" "^\\*scratch\\*$" "^\\*eldoc\\*$"
+                              "^\\ ?*EGLOT" "^\\*Buffer List\\*$"
+                              "^\\*Org Src" "^\\*tramp" "^\\*refs:")))
+#+END_SRC
+** Eglot
+*** Ensure eglot is loaded                                              :hook:
+#+BEGIN_SRC emacs-lisp
+(add-hook! 'doom-after-init-modules-hook (defun uki/require-eglot-h (&rest _)
+                                           "Require eglot."
+                                           (require 'eglot)))
+#+END_SRC
+*** [Java] JDTLS startup                                              :advice:
+Selects jdtls jar by matching a pattern so I don't have to change it
+manually after compiling new version.
+It assumes a single file will be returned.
+Stolen from [[https://cestlaz.github.io/post/using-emacs-74-eglot/][cestlaz.github.io]].
+#+BEGIN_SRC emacs-lisp
+(defun uki/eclipse-jdt-jar ()
+  "Get path of Eclipse Language Server launcher jar."
+  (car ; will fail if not installed
+   (file-expand-wildcards
+    (concat uki/dotfiles-dir
+            "../eclipse.jdt.ls/org.eclipse.jdt.ls.product/"
+            "target/repository/plugins/org.eclipse.equinox.launcher_*.jar") t)))
+
+(defadvice! uki/setup-jdtls-classpath-a (orig-fn &optional interactive)
+  "Set env var $CLASSPATH."
+  :around #'eglot--eclipse-jdt-contact
+  (let ((cp (getenv "CLASSPATH")))
+    (if (s-blank? cp)
+        (setenv "CLASSPATH" (uki/eclipse-jdt-jar))
+      (setenv "CLASSPATH" (concat (uki/eclipse-jdt-jar) ":" cp)))
+    (unwind-protect (funcall orig-fn interactive)
+      (setenv "CLASSPATH" cp))))
+#+END_SRC
+*** [Java] Support for recursive projects                          :setq:hack:
+#+BEGIN_SRC emacs-lisp
+(after! eglot
+  (cl-defmethod eglot-initialization-options ((server eglot-eclipse-jdt))
+    "Passes through required jdt initialization options"
+    `(:workspaceFolders
+      [,@(mapcar #'eglot--path-to-uri
+                 (let ((root (expand-file-name (project-root (eglot--project server))))
+                       projects
+                       candidate)
+                   (while (or (file-exists-p (setq candidate (expand-file-name "../pom.xml" root)))
+                              (file-exists-p (setq candidate (expand-file-name "../build.gradle" root)))
+                              (file-exists-p (setq candidate (expand-file-name "../.project" root))))
+                     (setq root (file-name-directory candidate)))
+                   (setq projects (list root)
+                         candidate projects)
+                   (cl-flet ((dig-deeper (dir) (append
+                                                (file-expand-wildcards (concat dir "*/pom.xml"))
+                                                (file-expand-wildcards (concat dir "*/build.gradle"))
+                                                (file-expand-wildcards (concat dir "*/.project")))))
+                     (while (setq candidate
+                                  (cl-delete-duplicates
+                                   (mapcar #'file-name-directory
+                                           (apply #'append
+                                                  (mapcar #'dig-deeper candidate)))
+                                   :test #'string=))
+                       (setq projects (append projects candidate))))
+                   projects))]
+      ,@(if-let ((home (or (getenv "JAVA_HOME")
+                           (ignore-errors
+                             (expand-file-name
+                              ".."
+                              (file-name-directory
+                               (file-chase-links (executable-find "javac"))))))))
+            `(:settings (:java (:home ,home)))
+          (ignore (eglot--warn "JAVA_HOME env var not set"))))))
+#+END_SRC
+*** Microsoft Python languageserver client                              :setq:
+#+BEGIN_SRC emacs-lisp
+(set-eglot-client! '(python-mode)
+                   '("~/src/ms-python-language-server/output/Microsoft.Python.LanguageServer"))
+#+END_SRC
+*** CSS languageserver client                                           :setq:
+#+BEGIN_SRC emacs-lisp
+(set-eglot-client! '(css-mode less-mode less-css-mode sass-mode scss-mode)
+                   '("css-languageserver" "--stdio"))
+#+END_SRC
+*** HTML languageserver client                                          :setq:
+#+BEGIN_SRC emacs-lisp
+(set-eglot-client! '(html-mode sgml-mode mhtml-mode web-mode)
+                   '("html-languageserver" "--stdio"))
+#+END_SRC
+*** Yaml languageserver client                                          :setq:
+#+BEGIN_SRC emacs-lisp
+(set-eglot-client! '(yaml-mode)
+                   '("yaml-language-server" "--stdio"))
+#+END_SRC
+*** Json languageserver client                                          :setq:
+#+BEGIN_SRC emacs-lisp
+(set-eglot-client! '(json-mode)
+                   '("json-languageserver" "--stdio"))
+#+END_SRC
+*** Dockerfile languageserver client                                    :setq:
+#+BEGIN_SRC emacs-lisp
+(set-eglot-client! '(dockerfile-mode)
+                   '("docker-langserver" "--stdio"))
+#+END_SRC
+*** Javascript/Typescript languageserver client                         :setq:
+#+BEGIN_SRC emacs-lisp
+(set-eglot-client!
+ '(rjsx-mode js-mode js-jsx-mode js2-mode js2-jsx-mode js3-mode
+             javascript-mode typescript-tsx-mode typescript-mode)
+ '("javascript-typescript-stdio"))
+#+END_SRC
+* Major-modes
+** Prog-mode
+*** <C-x =>/<SPC c => Align your code in a pretty way                   :bind:
+#+BEGIN_SRC emacs-lisp
+(map! :map prog-mode-map
+      "C-x =" #'align-regexp
+      (:leader :prefix ("c" "+code")
+        :desc "Align regexp" "=" #'align-regexp))
+#+END_SRC
+*** Highlight trailing whitespace                                  :hook:setq:
+#+BEGIN_SRC emacs-lisp
+(add-hook! 'prog-mode-hook (defun uki/set-trailing-whitespace-h ()
+                             "Set `show-trailing-whitespace'."
+                             (setq! show-trailing-whitespace t)))
+#+END_SRC
+** Dired
+*** Reuse current dired buffer when changing directories                :bind:
+#+BEGIN_SRC emacs-lisp
+(defun uki/up-directory-alternative ()
+  "Use single instance of dired buffer when going up a directory."
+  (interactive)
+  (set-buffer-modified-p nil) ;; don't need to save dired buffers
+  (find-alternate-file ".."))
+
+(defun uki/find-alt-file-for-directories ()
+  "Use single instance of dired buffer when opening files."
+  (interactive)
+  (let ((file (dired-get-file-for-visit)))
+    (if (file-directory-p file)
+        (progn
+          (set-buffer-modified-p nil) ;; don't need to save dired buffers
+          (find-alternate-file file))
+      (find-file file))))
+
+(map! :after dired :map dired-mode-map
+      [remap dired-find-file]    #'uki/find-alt-file-for-directories
+      [remap dired-up-directory] #'uki/up-directory-alternative)
+#+END_SRC
+*** Permanent ~dired-hide-details-mode~                                 :bind:
+TODO: persist details state between restarts
+#+BEGIN_SRC emacs-lisp
+(defun uki/toggle-permanent-dired-hide-details-mode ()
+  "Toggles `dired-hide-details-mode' for current and future dired buffers."
+  (interactive)
+  (if (memq #'dired-hide-details-mode dired-mode-hook)
+      (progn
+        (dired-hide-details-mode -1)
+        (remove-hook 'dired-mode-hook #'dired-hide-details-mode))
+    (dired-hide-details-mode +1)
+    (add-hook 'dired-mode-hook #'dired-hide-details-mode)))
+
+(map! :after dired :map dired-mode-map
+      (:localleader :desc "Hide-Details" "d" #'uki/toggle-permanent-dired-hide-details-mode)
+      ([remap dired-hide-details-mode] #'uki/toggle-permanent-dired-hide-details-mode))
+#+END_SRC
+*** Run dired instead of listing directory
+Why so complicated? [[https://nullprogram.com/blog/2019/12/10/#cl-first]]
+#+BEGIN_SRC emacs-lisp
+(after! dired
+  (defalias 'list-directory 'dired)
+  (put 'list-directory 'byte-optimizer 'byte-compile-inline-expand))
+#+END_SRC
+** Org
+*** Startup options                                                     :setq:
+#+BEGIN_SRC emacs-lisp
+(after! org
+  (setq! org-tags-column -80
+         org-startup-indented t
+         org-startup-folded t
+         org-startup-truncated t
+         org-startup-align-all-tables t))
+#+END_SRC
+*** My ~org-directory~                                                  :setq:
+#+BEGIN_SRC emacs-lisp
+(setq! org-directory "~/org/")
+#+END_SRC
+*** Bind ~org-babel-tangle~ under :localleader                          :bind:
+#+BEGIN_SRC emacs-lisp
+(map! :after org :map org-mode-map
+      :localleader :desc "Tangle current file" "B" #'org-babel-tangle)
+#+END_SRC
+*** Follow link under point with <RET>                                  :setq:
+#+BEGIN_SRC emacs-lisp
+(after! org
+  (setq! org-return-follows-link t))
+#+END_SRC
+*** Support for Google Analytics in html publishing                     :hook:
+Stolen from [[https://raw.githubusercontent.com/takaishi/.emacs.d/master/conf.d/30_org-mode.org][takaishi/.emacs.d]]
+#+BEGIN_SRC emacs-lisp
+(defun uki/add-google-analytics-h (orig-file result-file)
+  "Adds Google Analytics Tracking code."
+  (let* ((project-plist (cdr (org-publish-get-project-from-filename orig-file)))
+         (code (plist-get project-plist :google-analytics-tracking-code)))
+    (when (and code (string= org-html-extension (file-name-extension result-file)))
+      (let (post-command-hook
+            kill-buffer-query-functions
+            before-save-hook
+            after-save-hook)
+        (with-current-buffer (find-file-noselect result-file t)
+          (goto-char (point-min))
+          (re-search-forward "</head>")
+          (goto-char (match-beginning 0))
+          (insert
+           (concat "
+<script type='text/javascript'>
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', '"
+                   code
+                   "']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+"))
+          (basic-save-buffer)
+          (kill-buffer))
+        (message "Added GA script.")
+        (sleep-for 1)))))
+
+(after! org
+  (add-hook 'org-publish-after-publishing-hook #'uki/add-google-analytics-h))
+#+END_SRC
+*** Publishing                                                          :setq:
+#+BEGIN_SRC emacs-lisp
+(after! ox-publish
+  (let ((root-dir "/davs:ukaszg@fastmail.fm@myfiles.fastmail.com:/www/")
+        (conf-dir "/davs:ukaszg@fastmail.fm@myfiles.fastmail.com:/www/config/")
+        (doompath (expand-file-name "hidden/doom.d/" uki/dotfiles-dir)))
+    (setq! org-publish-project-alist
+           `(("gruner.lu/kasz/config" :components ("config-static-resources" "config.html" "favicon.ico"))
+             ("favicon.ico"
+              :base-directory ,doompath
+              :publishing-directory ,root-dir
+              :publishing-function org-publish-attachment
+              :include ("favicon.ico")
+              :exclude ".*")
+             ("config-static-resources"
+              :base-directory ,doompath
+              :publishing-directory ,conf-dir
+              :publishing-function org-publish-attachment
+              :include ("config.css" "Droid_Sans_Mono.woff2")
+              :exclude ".*")
+             ("config.html" ;file name will be index.html (see header)
+              :base-directory ,doompath
+              :include ("config.org")
+              :exclude ".*"
+              :publishing-directory ,conf-dir
+              :html-postamble nil
+              :publishing-function org-html-publish-to-html
+              :google-analytics-tracking-code "UA-179015086-1"
+              :keywords "config.org, doom literate config, init.el"
+              :html-doctype "html5"
+              :html-html5-fancy t)))))
+#+END_SRC
+*** [Flycheck] Disable textlint checker                            :hook:setq:
+#+BEGIN_SRC emacs-lisp
+(after! org
+  (add-hook! 'org-mode-hook
+    (cl-pushnew 'textlint flycheck-disabled-checkers)))
+#+END_SRC
+*** Have export dialog open in place and without modeline              :popup:
+#+BEGIN_SRC emacs-lisp
+(after! org
+  (require 'ox nil t)
+  (set-popup-rule! "^ ?\\*Org Export Dispatcher"
+    :actions '(display-buffer-same-window)
+    :modeline nil))
+#+END_SRC
+*** Have =org-src= buffers be managed by orgmode                  :setq:popup:
+#+BEGIN_SRC emacs-lisp
+(after! org
+  (setq! org-src-window-setup 'current-window))
+(set-popup-rule! "^\\*Org Src" :ignore t)
+#+END_SRC
+*** Display =org-src= buffer instead of '.org' file              :advice:hook:
+By default in Doom when =org-src= buffers loose focus they
+can't be switched to easily. This will always show =org-src=
+buffer instead of orgmode if any such buffer is open.
+#+BEGIN_SRC emacs-lisp
+(defun uki/maybe-select-org-src-buffer-instead (&rest _)
+  "In org-mode, switch to this file's org-src buffer if present."
+  (when (eq major-mode 'org-mode)
+    (let ((regexp  (concat "^\\*Org Src " (buffer-name) "\\["))
+          (buffers (buffer-list))
+          doom-switch-buffer-hook
+          buf)
+      (while (setq buf (pop buffers))
+        (when (string-match-p regexp (buffer-name buf))
+          (setq buffers nil)
+          (set-window-buffer (selected-window) buf))))))
+
+(defadvice! uki/enable-select-org-src-buffer-instead-a (&rest _)
+  "Turns on auto-selecting org-src buffer."
+  :after #'org-edit-src-code
+  (add-hook 'doom-switch-buffer-hook #'uki/maybe-select-org-src-buffer-instead)
+  (advice-add 'bury-buffer :after #'uki/maybe-select-org-src-buffer-instead)
+  (advice-add 'kill-current-buffer :after #'uki/maybe-select-org-src-buffer-instead))
+
+(defadvice! uki/disable-select-org-src-buffer-instead-a (&rest _)
+  "Turns off auto-selecting org-src buffer."
+  :before #'org-edit-src-exit
+  (remove-hook 'doom-switch-buffer-hook #'uki/maybe-select-org-src-buffer-instead)
+  (advice-remove 'bury-buffer #'uki/maybe-select-org-src-buffer-instead)
+  (advice-remove 'kill-current-buffer #'uki/maybe-select-org-src-buffer-instead))
+#+END_SRC
+*** Enable and fix =org-eldoc=                                   :advice:hook:
+DOOM doesn't use stock Eldoc which causes =org-eldoc= to assume
+Emacs is version 28 (with more recent emacs-lisp-mode).
+So I bind old documentation function to new handles.
+#+BEGIN_SRC emacs-lisp
+(unless (<= 28 emacs-major-version)
+  (after! org
+    (require 'org-eldoc nil t)
+    (add-hook! '(org-mode-hook)
+               :append
+               (defun uki/enable-org-eldoc-h (&rest _)
+                 "Setup `eldoc-documentation-function' and enable `org-eldoc-mode'."
+                 (interactive)
+                 (setq-local eldoc-documentation-strategy
+                             'eldoc-documentation-default)
+                 (add-function :before-until (local 'eldoc-documentation-function)
+                               #'org-eldoc-documentation-function)
+                 (puthash "org"
+                          #'org-eldoc-documentation-function
+                          org-eldoc-local-functions-cache)
+                 (eldoc-mode +1)))))
+#+END_SRC
+** Info
+*** Automatically view '.info' files instead of editing them            :setq:
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'auto-mode-alist
+             (cons "\\.[iI][nN][fF][oO]\\'"
+                   (defun uki/reopen-file-in-info-mode-h ()
+                     "Run this in an info viewer."
+                     (interactive)
+                     (let ((file-name (buffer-file-name)))
+                       (kill-buffer)
+                       (info file-name)))))
+#+END_SRC
+*** Display =*info*= buffers in same window                            :popup:
+and disable the modeline.
+#+BEGIN_SRC emacs-lisp
+(set-popup-rule! "^\\*info\\*$"
+  :actions '(display-buffer-same-window)
+  :modeline nil)
+#+END_SRC
+*** Left mouse button should follow links                               :bind:
+#+BEGIN_SRC emacs-lisp
+(map! :after info :map Info-mode-map
+      "<mouse-1>" #'Info-mouse-follow-nearest-node)
+#+END_SRC
+** Emacs-lisp
+*** Eldoc will show 1st line of function documentation                :advice:
+#+BEGIN_SRC emacs-lisp
+(declare-function helpful--docstring "helpful" (sym callable-p))
+
+(defadvice! uki/eldoc-elisp-add-fundoc-a (orig-fn sym &optional index prefix)
+  "Add a 1st line of docstring to ElDoc's function information."
+  :around #'elisp-get-fnsym-args-string
+  (require 'helpful)
+  (let ((orig (funcall orig-fn sym index prefix))
+        (doc  (condition-case nil
+                  (replace-regexp-in-string "[\t \n\r]+"
+                                            " "
+                                            (substitute-command-keys
+                                             (helpful--docstring sym t))
+                                            t
+                                            t)
+                (error ""))))
+    (if (s-blank? doc)
+        orig
+      (s-truncate
+       (- (frame-width) (length orig) 1)
+       (concat orig " " (propertize doc 'face 'font-lock-doc-face))
+       (concat "[" uki/ellipsis "]")))))
+#+END_SRC
+*** [Flycheck] Disable elisp-checkdoc                              :hook:setq:
+#+BEGIN_SRC emacs-lisp
+(after! flycheck
+  (add-hook! 'emacs-lisp-mode-hook
+    (cl-pushnew 'emacs-lisp-checkdoc flycheck-disabled-checkers)))
+#+END_SRC
+** Java
+*** Set ~compile-command~ to maven                                 :hook:setq:
+#+BEGIN_SRC emacs-lisp
+(setq-hook! 'java-mode-hook
+  compile-command "mvn clean install -DskipTests")
+#+END_SRC
+*** Use long lines                                                 :hook:setq:
+#+BEGIN_SRC emacs-lisp
+(setq-hook! 'java-mode-hook
+  fill-column 160)
+#+END_SRC
+* Auto tangle & compile
+My =~/.doom.d/config.org= is a softlink, so depending on if I open a symlink or
+concrete file, ~+literate-enable-recompile-h~ might not recognize it as literate config.
+
+As a workaround I disable literate autotangle.
+#+BEGIN_SRC emacs-lisp
+(after! org
+  (remove-hook 'org-mode-hook #'+literate-enable-recompile-h))
+#+END_SRC
+
+And then add following at the end of =config.org= (will also [re]compile tangled files).
+: # Local Variables:
+: # eval: (add-hook 'after-save-hook (lambda () (org-babel-tangle) (byte-recompile-directory doom-private-dir 0 t)) nil t)
+: # End:

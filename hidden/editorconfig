@@ -1,0 +1,23 @@
+# -*- mode: conf; -*- # vim: set ft=ini
+# top-most EditorConfig file
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+charset = utf-8
+indent_style = space
+indent_size = 4
+
+[Makefile,*.mk]
+indent_style = tab
+
+[{package.json,*.yml,*.yaml}]
+indent_size = 2
+
+[{*.el}]
+indent_size = 2
+
+[*.js,*.jsx,*.ts,*.tsx]
+indent_size = 3

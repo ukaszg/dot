@@ -1,0 +1,117 @@
+#+TITLE:  Curriculum Vitae - Łukasz Gruner
+#+OPTIONS: num:nil f:t H:2 toc:nil todo:nil ::t ':t *:t -:t
+#+LANGUAGE: en
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="css/cv.css" />
+#+OPTIONS: html-postamble:uki-cv-postamble
+
+* Contact
+:PROPERTIES:
+:CUSTOM_ID: contact-info
+:END:
+: phone.: +48 667 897 973
+: e-mail: lukasz@gruner.lu
+: adress: ul. Stefana Żeromskiego 15, Piastów
+: code:   https://bitbucket.org/ukaszg/
+
+* Work experience
+
+** VII 2014 - XII 2014
+Comp S.A.
+
+Programmer
+- Developing portal for law firm management. 
+
+Used technologies:
+JSF, PrimeFaces, Java Beans, Hibernate, Postgresql, Activity. 
+
+** XII 2012 - IX 2013
+	Syndatis sp. z.o.o. - document flow, bpm.
+
+	Programmer
+	- Mainterance of systems under my care.
+	- Developing the common framework and implementing solutions for new customers.
+
+** V 2012 - X 2012
+	E-CommerceServices - Part of EMPIK (empik.com and smyk.pl).
+
+	Programmer
+	- Mainterance and development of web stores and internal administration system.
+	- Used tech: Spring Integration, FreeMarker, SmartGWT, Oracle
+
+** XII 2009 – IV 2012
+	EURO-net sp z.o.o. Poland's largest distributor of consumer electronics and home appliances.
+
+	Analyst / Programmer
+	- Gathering needs, designing, specification and testing of new solutions.
+	- Support webshop systems and Call Center.
+	- Testing and quality control.
+	- Coordination of projects under my care with the rest of company systems.
+
+** VII 2008 - VIII 2009
+	NETSPRINT.PL Sp. z o.o. – search solutions and context advertisment.
+
+	Analyst / Programmer
+	- Design and creation of new advertising systems solutions.
+	- Deployment execution and system mainterance.
+
+	Completed projects
+	- Migration of postgresql databases to master-slave configuration.
+	- Implementation of a single-page ajax/js application for managing NsContext project.
+	- Project and implementation of sql query generator for content management system.
+
+** I 2008 - IV 2008
+	AMG.net technology consulting company specializing in building and maintaining modern IT solutions.
+
+	Tester / Programmer
+	- Implementation of a functional testing (keyword-driven) framework.
+	- Development and maintenance of the portal regression tests.
+
+* Education
+** 2000r - 2002r
+Wyższa Szkoła Kupiecka w Zgierzu
+field of study: Marketing and Management
+
+Completed a BA degree with a rating of "good".
+
+** 2002r - 2004r
+Polytechnic of Łódz
+departament: Fizyka Techniczna i Matematyka Stosowana
+field of study: Information technology
+
+Interrupted after the third year of study.
+
+* Skills
+
+** Python stack
+	python2.x, Django
+
+** JVM stack
+	 Java, J2EE, JBpm, Tomcat, Selenium (1 & 2), Spring, Hibernate, GWT, Vaadin, YourKit Java Profiler.
+
+** Javascript/CSS
+	JQuery, Backbone, AngularJS, Marionettejs, Mootools, CSS3 (SCSS, SASS), Haml.
+
+** Databases
+	 PostgreSQL, MySQL, SQLServer, Oracle.
+
+** Operating system
+	- BSD & Linux: usage, configuration and administration
+	- Windows: usage and configuration
+
+** Version control
+	 svn, mercurial, git, cvs.
+
+** Personal traits
+	Commitment, creativity, highly developed analytical thinking, accuracy, curiosity, independence.
+
+** Other
+	sh/bash, Lua, Go, Linux, FreeBSD, OpenBSD, C, UI design.
+	
+** Foreign languages
+	- English: very good written and spoken.
+	- German: basic (passive knowledge - only able to understand).
+	  
+* Hobby
+  Unix, bicycles, swimming, diy.
+  
+

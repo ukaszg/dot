@@ -1,0 +1,40 @@
+[user]
+    name = Łukasz Gruner
+    email = lukasz@gruner.lu
+	signingkey = 865929DCF81AAE45
+[push]
+    default = current
+    followTags = true
+[rebase]
+    autoStash = true
+[merge]
+    conflictstyle = diff3
+[color]
+	diff = true
+	grep = true
+	branch = true
+	decorate = true
+	interactive = true
+	pager = false
+	showbranch = true
+	status = true
+	ui = true
+[core]
+	autocrlf = false
+[rerere]
+  enabled = true
+[transfer]
+  fsckobjects = true
+[alias]
+  serve = daemon --verbose --export-all --base-path=.git --reuseaddr --strict-paths .git/
+  svnup = !git svn fetch && git svn rebase && git stash pop -q
+  st = status
+  ci = commit
+  co = checkout
+  up = pull
+  pr = pull --rebase 
+  glog = log --pretty=format:\"%C(yellow)%h%C(reset) %C(green)%ad%C(reset) %C(red)|%C(reset) %s %C(bold blue)[%an]%C(reset)%C(yellow)%d%C(reset)\" --graph --date=short
+  prune = fetch --prune
+  conflicts = !git diff --name-only --diff-filter=U | sort -u | xargs $EDITOR
+[commit]
+	gpgSign = true

@@ -1,0 +1,114 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: Add regolith-desktop repository
+      apt_repository:
+        repo: ppa:regolith-linux/unstable
+
+    - name: Add docker gpg-key to Ubuntu
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+
+    - name: Add official docker-ce repository to Ubuntu
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+
+    - name: Install/update vim-plug for neovim
+      shell: 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+      args:
+          warn: no # module: fetch doesn't dig environment variables
+
+    - name: Install my packages
+      ignore_errors: yes
+      apt:
+        update_cache: yes
+        force_apt_get: yes
+        state: latest
+        name:
+          - autoconf
+          - build-essential
+          - ccls
+          - clang-format
+          - conky-cli
+          - containerd.io
+          - cmake
+          - curl
+          - docker-ce
+          - docker-ce-cli
+          - docker-compose
+          - fd-find
+          - firefox
+          - fish
+          - fonts-symbola
+          - fonts-terminus
+          - gimp
+          - git
+          - glslang-tools
+          - gnome-books
+          - gnome-calendar
+          - gnome-contacts
+          - gnome-documents
+          - gnome-music
+          - gnome-tweaks
+          - gnome-user-share
+          - golang
+          - grep
+          - hsetroot
+          - htop
+          - i3xrocks-battery
+          - i3xrocks-bluetooth
+          - i3xrocks-cpu-usage
+          - i3xrocks-memory
+          - i3xrocks-net-traffic
+          - i3xrocks-time
+          - i3xrocks-volume
+          - jq
+          - libacl1-dev
+          - libdbus-1-dev
+          - libgconf2-dev
+          - libgnutls28-dev
+          - libgtk-3-dev
+          - libjpeg-dev
+          - libgif-dev
+          - libm17n-dev
+          - libotf-dev
+          - librsvg2-dev
+          - libsystemd-dev
+          - libtiff-dev
+          - libtool
+          - libtool-bin
+          - libgnutls28-dev
+          - libncurses-dev
+          - libjansson-dev
+          - libwebkit2gtk-4.0-dev
+          - gnutls-bin
+          - mc
+          - mplayer
+          - neovim
+          - node-js-beautify
+          - npm
+          - pandoc
+          - python-is-python3
+          - python3-pip
+          - python3-xlib
+          - regolith-compositor-none
+          - regolith-default-settings
+          - regolith-desktop
+          - ripgrep
+          - rxvt-unicode-256color
+          - samba-common-bin
+          - steam:i386
+          - sudo
+          - texinfo
+          - texlive-latex-base
+          - texlive-fonts-recommended
+          - texlive-fonts-extra
+          - texlive-latex-extra
+          - tidy
+          - wine32:i386
+          - winetricks
+          - xfonts-terminus
+          - xfonts-terminus-dos
+          - xfonts-terminus-oblique
+          - xorg-dev

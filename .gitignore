@@ -1,0 +1,4 @@
+*.elc
+ansible.log
+/files/org/*.pdf
+/files/org/*.tex

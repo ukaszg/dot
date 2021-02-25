@@ -1,0 +1,30 @@
+---
+- hosts: all
+  tasks:
+    - name: Generate ssh key
+      user:
+        name: uki
+        generate_ssh_key: yes
+        ssh_key_bits: 4096
+        ssh_key_type: "rsa"
+        ssh_key_file: .ssh/id_rsa
+        ssh_key_comment: "lukasz@gruner.lu"
+
+    - name: Fetch my GPG keys
+      git:
+          repo: git@gitlab.com:ukaszg/_gpg.git
+          dest: ~/.gpg
+          clone: yes
+          update: yes
+
+    - name: Set fish as my default shell
+      user:
+        name: uki
+        shell: /usr/bin/fish
+
+    - name: Add me to a docker group
+      user:
+        name: uki
+        groups: docker
+        append: yes
+      become: true
