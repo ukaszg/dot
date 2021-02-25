@@ -12,7 +12,7 @@
 
     - name: Fetch my GPG keys
       git:
-          repo: git@gitlab.com:ukaszg/_gpg.git
+          repo: git@github.com:ukaszg/_gpg.git
           dest: ~/.gpg
           clone: yes
           update: yes
