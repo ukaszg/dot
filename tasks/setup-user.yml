@@ -1,10 +1,30 @@
 ---
 - hosts: all
+  become: false
+  vars:
+    home_dirs:
+      - bin
+      - m
+      - pic/wp
+      - pub
+      - vid
+      - src
+      - incoming
+      - .cache
+      - .templates
+      - .local/share/info
+      - org
   tasks:
+    - name: Create home directories
+      file:
+        path: "{{ ansible_facts['user_dir'] }}/{{ item }}"
+        state: directory
+      loop: "{{ home_dirs }}"
+
     - name: Fetch my GPG keys
       git:
-          repo: git@github.com:ukaszg/_gpg.git
-          dest: ~/.gpg
+          repo: git@github.com:ukaszg/_gnupg.git
+          dest: "{{ ansible_facts['user_dir'] }}/.gnupg"
           clone: yes
           update: yes
 

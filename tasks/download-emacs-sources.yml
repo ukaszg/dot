@@ -1,5 +1,6 @@
 ---
 - hosts: all
+  become: false
   tasks:
     - name: Download emacs code
       git:
@@ -10,25 +11,6 @@
     - name: Download doom-emacs code
       git:
         repo: https://github.com/hlissner/doom-emacs
-        dest: ~/.emacs.d
+        dest: "{{ ansible_facts['user_dir'] }}/.emacs.d"
         version: develop
 
-    - name: Download JDT LSP code
-      git:
-        repo: https://github.com/eclipse/eclipse.jdt.ls.git
-        dest: ~/src/eclipse.jdt.ls
-
-    - name: Download MS Python LSP code
-      git:
-        repo: https://github.com/Microsoft/python-language-server.git
-        dest: ~/src/ms-python-language-server
-
-    - name: Pull dotnet-sdk image from hub.docker.com
-      docker_image:
-          name: mcr.microsoft.com/dotnet/core/sdk:3.1-focal 
-          source: pull
-
-    - name: Compile Microsoft.Python.LanguageServer if needed
-      shell: docker run --rm --name=dotnet -e "DOTNET_CLI_TELEMETRY_OPTOUT=1" -v ~/src/ms-python-language-server:/app -w /app/src/LanguageServer/Impl mcr.microsoft.com/dotnet/core/sdk:3.1-focal dotnet publish -c Release -r ubuntu.20.04-x64 -p:PublishReadyToRun=true -o /app/output --self-contained=true --nologo --force --verbosity=n
-      args:
-          creates: ~/src/ms-python-language-server/output/Microsoft.Python.LanguageServer
