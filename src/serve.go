@@ -14,22 +14,3 @@ func main() {
 	fmt.Printf("listening on: http://localhost:%s/", *port)
 	http.ListenAndServe(fmt.Sprintf(":%s", *port), http.FileServer(http.Dir(path)))
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
