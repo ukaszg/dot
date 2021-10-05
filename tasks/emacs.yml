@@ -2,12 +2,6 @@
 - hosts: all
   become: false
   tasks:
-    - name: Download emacs code
-      git:
-        repo: git://git.savannah.gnu.org/emacs.git
-        dest: ~/src/emacs
-        version: emacs-27.1
-
     - name: Download doom-emacs code
       git:
         repo: https://github.com/hlissner/doom-emacs

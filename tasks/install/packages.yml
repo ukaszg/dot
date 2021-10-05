@@ -14,6 +14,10 @@
       apt_repository:
         repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
 
+    - name: Add regolith-desktop repository
+      apt_repository:
+        repo: ppa:kelleyk/emacs
+
     - name: Install my packages
       ignore_errors: yes
       apt:
@@ -35,6 +39,8 @@
           - docker-ce
           - docker-ce-cli
           - docker-compose
+          - emacs27
+          - emacs27-el
           - fakeroot
           - fd-find
           - firefox
@@ -112,6 +118,7 @@
           - xfonts-terminus-dos
           - xfonts-terminus-oblique
           - xorg-dev
+          - yui-compressor
 
     - name: Install/update vim-plug for neovim
       shell: |
