@@ -44,7 +44,7 @@
        :term       vterm
        :checkers   syntax
        :tools      ansible debugger (docker +lsp) editorconfig (eval +overlay)
-                   (lookup +docsets) (lsp +eglot) magit make prodigy
+                   (lookup +docsets) lsp magit make prodigy
        :lang       (cc +lsp) data emacs-lisp (go +lsp) (java +lsp)
                    (javascript +lsp) (json +lsp) lua markdown org (python +lsp)
                    (sh +fish +lsp) (web +lsp) (yaml +lsp)
@@ -229,111 +229,6 @@ I like electric-pair-mode.
                               "^\\*Messages\\*$" "^\\*scratch\\*$" "^\\*eldoc\\*$"
                               "^\\ ?*EGLOT" "^\\*Buffer List\\*$"
                               "^\\*Org Src" "^\\*tramp" "^\\*refs:")))
-#+END_SRC
-** Eglot
-*** Ensure eglot is loaded                                              :hook:
-#+BEGIN_SRC emacs-lisp
-(add-hook! 'doom-after-init-modules-hook (defun uki/require-eglot-h (&rest _)
-                                           "Require eglot."
-                                           (require 'eglot)))
-#+END_SRC
-*** [Java] JDTLS startup                                              :advice:
-Selects jdtls jar by matching a pattern so I don't have to change it
-manually after compiling new version.
-It assumes a single file will be returned.
-Stolen from [[https://cestlaz.github.io/post/using-emacs-74-eglot/][cestlaz.github.io]].
-#+BEGIN_SRC emacs-lisp
-(defun uki/eclipse-jdt-jar ()
-  "Get path of Eclipse Language Server launcher jar."
-  (car ; will fail if not installed
-   (file-expand-wildcards
-    (concat uki/dotfiles-dir
-            "../eclipse.jdt.ls/org.eclipse.jdt.ls.product/"
-            "target/repository/plugins/org.eclipse.equinox.launcher_*.jar") t)))
-
-(defadvice! uki/setup-jdtls-classpath-a (orig-fn &optional interactive)
-  "Set env var $CLASSPATH."
-  :around #'eglot--eclipse-jdt-contact
-  (let ((cp (getenv "CLASSPATH")))
-    (if (s-blank? cp)
-        (setenv "CLASSPATH" (uki/eclipse-jdt-jar))
-      (setenv "CLASSPATH" (concat (uki/eclipse-jdt-jar) ":" cp)))
-    (unwind-protect (funcall orig-fn interactive)
-      (setenv "CLASSPATH" cp))))
-#+END_SRC
-*** [Java] Support for recursive projects                          :setq:hack:
-#+BEGIN_SRC emacs-lisp
-(after! eglot
-  (cl-defmethod eglot-initialization-options ((server eglot-eclipse-jdt))
-    "Passes through required jdt initialization options"
-    `(:workspaceFolders
-      [,@(mapcar #'eglot--path-to-uri
-                 (let ((root (expand-file-name (project-root (eglot--project server))))
-                       projects
-                       candidate)
-                   (while (or (file-exists-p (setq candidate (expand-file-name "../pom.xml" root)))
-                              (file-exists-p (setq candidate (expand-file-name "../build.gradle" root)))
-                              (file-exists-p (setq candidate (expand-file-name "../.project" root))))
-                     (setq root (file-name-directory candidate)))
-                   (setq projects (list root)
-                         candidate projects)
-                   (cl-flet ((dig-deeper (dir) (append
-                                                (file-expand-wildcards (concat dir "*/pom.xml"))
-                                                (file-expand-wildcards (concat dir "*/build.gradle"))
-                                                (file-expand-wildcards (concat dir "*/.project")))))
-                     (while (setq candidate
-                                  (cl-delete-duplicates
-                                   (mapcar #'file-name-directory
-                                           (apply #'append
-                                                  (mapcar #'dig-deeper candidate)))
-                                   :test #'string=))
-                       (setq projects (append projects candidate))))
-                   projects))]
-      ,@(if-let ((home (or (getenv "JAVA_HOME")
-                           (ignore-errors
-                             (expand-file-name
-                              ".."
-                              (file-name-directory
-                               (file-chase-links (executable-find "javac"))))))))
-            `(:settings (:java (:home ,home)))
-          (ignore (eglot--warn "JAVA_HOME env var not set"))))))
-#+END_SRC
-*** Microsoft Python languageserver client                              :setq:
-#+BEGIN_SRC emacs-lisp
-(set-eglot-client! '(python-mode)
-                   '("~/src/ms-python-language-server/output/Microsoft.Python.LanguageServer"))
-#+END_SRC
-*** CSS languageserver client                                           :setq:
-#+BEGIN_SRC emacs-lisp
-(set-eglot-client! '(css-mode less-mode less-css-mode sass-mode scss-mode)
-                   '("css-languageserver" "--stdio"))
-#+END_SRC
-*** HTML languageserver client                                          :setq:
-#+BEGIN_SRC emacs-lisp
-(set-eglot-client! '(html-mode sgml-mode mhtml-mode web-mode)
-                   '("html-languageserver" "--stdio"))
-#+END_SRC
-*** Yaml languageserver client                                          :setq:
-#+BEGIN_SRC emacs-lisp
-(set-eglot-client! '(yaml-mode)
-                   '("yaml-language-server" "--stdio"))
-#+END_SRC
-*** Json languageserver client                                          :setq:
-#+BEGIN_SRC emacs-lisp
-(set-eglot-client! '(json-mode)
-                   '("json-languageserver" "--stdio"))
-#+END_SRC
-*** Dockerfile languageserver client                                    :setq:
-#+BEGIN_SRC emacs-lisp
-(set-eglot-client! '(dockerfile-mode)
-                   '("docker-langserver" "--stdio"))
-#+END_SRC
-*** Javascript/Typescript languageserver client                         :setq:
-#+BEGIN_SRC emacs-lisp
-(set-eglot-client!
- '(rjsx-mode js-mode js-jsx-mode js2-mode js2-jsx-mode js3-mode
-             javascript-mode typescript-tsx-mode typescript-mode)
- '("javascript-typescript-stdio"))
 #+END_SRC
 * Major-modes
 ** Prog-mode
