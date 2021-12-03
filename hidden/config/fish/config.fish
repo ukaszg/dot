@@ -17,3 +17,6 @@ set -x INFOPATH "~/.local/share/info/:$INFOPATH"
 
 # don't create `__pycache__` directories
 set -x PYTHONDONTWRITEBYTECODE 'True'
+
+# type gpg password using terminal
+set -x GPG_TTY (tty)
