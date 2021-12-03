@@ -6,7 +6,7 @@
 #+OPTIONS: tags:t tasks:t todo:t inline:t num:nil toc:nil html-style:nil
 #+STARTUP: indent hidestars
 #+PROPERTY: header-args:emacs-lisp :tangle ~/.doom.d/config.el :tangle-mode (identity #o400) :results silent :exports code :lexical yes :mkdirp no
-#+HTML_HEAD: <link rel="preload" href="Droid_Sans_Mono.woff2" as="font" type="font/woff2" />
+#+HTML_HEAD: <link rel="preload" href="Zenburn.woff2" as="font" type="font/woff2" />
 #+HTML_HEAD_EXTRA: <link rel="stylesheet" type="text/css" href="config.css" />
 #+EXPORT_FILE_NAME: index.html
 #+LINK_HOME: https://gruner.lu/kasz/
@@ -36,19 +36,21 @@
 ** Modules configuration (init.el)
 #+BEGIN_SRC emacs-lisp :tangle ~/.doom.d/init.el
 ;;; ~/.doom.d/init.el -*- lexical-binding: t; -*-
-(doom! :completion (company +childframe) (ivy +icons +prescient)
-       :ui         doom doom-dashboard hl-todo modeline nav-flash ophints treemacs
+(doom! :completion company (vertico +icons)
+       :ui         doom doom-dashboard doom-quit
+                   hl-todo modeline nav-flash ophints treemacs
                    (popup +all +defaults) vc-gutter vi-tilde-fringe workspaces
        :editor     (evil +everywhere) file-templates fold format snippets word-wrap
        :emacs      (dired +icons) (ibuffer +icons) undo vc
        :term       vterm
        :checkers   syntax
-       :tools      ansible debugger (docker +lsp) editorconfig (eval +overlay)
-                   (lookup +docsets) lsp magit make prodigy
+       :tools      ansible debugger (docker +lsp) (eval +overlay)
+                   (lookup +docsets) lsp magit make prodigy upload
+       :os         tty
        :lang       (cc +lsp) data emacs-lisp (go +lsp) (java +lsp)
                    (javascript +lsp) (json +lsp) lua markdown org (python +lsp)
-                   (sh +fish +lsp) (web +lsp) (yaml +lsp)
-       :config     literate (default +bindings))
+                   rest (sh +fish +lsp) (web +lsp) (yaml +lsp)
+       :config     literate (default +bindings +smartparens))
 #+END_SRC
 ** *HACKS*
 *** fix defvaralias eldoc-documentation-function                   :setq:hack:

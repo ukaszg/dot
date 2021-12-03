@@ -1,9 +1,9 @@
 @font-face {
-  font-family: 'Droid Sans Mono';
+  font-family: 'Terminus';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: local('Droid Sans Mono Regular'), local('DroidSansMono-Regular'), url(Droid_Sans_Mono.woff2) format('woff2');
+  src: local('Terminus'), url(Terminus.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 .title {
@@ -39,13 +39,13 @@
   display: none;
 }
 #org-div-home-and-up {
-  font-family: 'Droid Sans Mono';
+  font-family: 'Terminus';
   text-align: right;
   font-size: 80%;
   white-space: nowrap;
 }
 textarea {
-  font-family: 'Droid Sans Mono';
+  font-family: 'Terminus';
   overflow-x: auto;
 }
 .linenr {
@@ -88,7 +88,7 @@ caption.t-bottom {
 .tag,
 pre,
 nav {
-  font-family: 'Droid Sans Mono' !important;
+  font-family: 'Terminus' !important;
   font-size: 80% !important;
 }
 nav a {
@@ -101,11 +101,11 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'Droid Sans Mono';
+  font-family: 'Terminus';
 }
 .tag {
   color: #3f3f3f;
-  font-family: 'Droid Sans Mono';
+  font-family: 'Terminus';
   font-size: 80%;
   background-color: #e0e0e0;
   padding: 2px;
@@ -115,7 +115,7 @@ pre.src-emacs-lisp:before {
   content: 'Emacs Lisp';
 }
 pre.src {
-  font-family: 'Droid Sans Mono';
+  font-family: 'Terminus';
   background: #3f3f3f;
   color: #dcdccc;
 }
