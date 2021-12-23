@@ -1,11 +1,15 @@
 ---
 - hosts: all
+  become: false
   module_defaults:
     npm:
       path: /home/uki/.local/
       production: yes
       state: latest
   tasks:
+    - name: Install formatter beautify
+      npm: name=beautify
+
     - name: Install formatter prettier
       npm: name=prettier
 
