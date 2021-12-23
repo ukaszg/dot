@@ -59,6 +59,8 @@ function fish_right_prompt --description 'Write out the prompt'
         set -g __fish_prompt_normal (set_color normal)
     end
 
-    printf '%s ' (__fish_vcs_prompt)
-    set_color normal
+    if not test "x$INSIDE_EMACS" = "xvterm"
+        printf '%s ' (__fish_vcs_prompt)
+        set_color normal
+    end
 end
