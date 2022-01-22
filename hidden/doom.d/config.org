@@ -74,6 +74,11 @@ take note that doom-emacs doesn't yet support emacs version 28
        doom-font                "Terminus:size=18"
        doom-big-font            "Terminus:size=28")
 #+END_SRC
+*** Start maximized
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+(add-to-list 'initial-frame-alist '(fullscreen . maximized))
+#+END_SRC
 *** Define const vars                                                   :setq:
 #+BEGIN_SRC emacs-lisp
 (defconst uki/dotfiles-dir "~/src/dot/" "Dotfiles repository root.")

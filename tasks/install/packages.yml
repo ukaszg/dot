@@ -51,6 +51,7 @@
           - fish
           - fonts-symbola
           - fonts-terminus
+          - glslang-tools
           - git
           - golang
           - grep
@@ -66,6 +67,7 @@
           - python-is-python3
           - python3-pip
           - ripgrep
+          - shellcheck
           - sqlite3
           - sudo
           - texinfo
