@@ -5,6 +5,7 @@
 [push]
     default = current
     followTags = true
+    recurseSubmodules = check
 [rebase]
     autoStash = true
 [merge]
@@ -20,7 +21,7 @@
 	status = true
 	ui = true
 [core]
-	autocrlf = false
+	autocrlf = true
 [rerere]
   enabled = true
 [transfer]
@@ -38,3 +39,10 @@
   conflicts = !git diff --name-only --diff-filter=U | sort -u | xargs $EDITOR
 [commit]
 	gpgSign = true
+[diff]
+    submodule = log
+[status]
+    submodulesummary = 1
+[submodule]
+    recurse = true
+
