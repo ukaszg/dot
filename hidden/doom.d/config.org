@@ -133,7 +133,7 @@ Some modes don't require macros (like most RO buffers).
   (setq! persp-autokill-buffer-on-remove 'kill
          persp-autokill-persp-when-removed-last-buffer 'kill))
 #+END_SRC
-** Hl-todo
+** Hl-Todo
 *** Setup colors/faces                                                  :setq:
 #+BEGIN_SRC emacs-lisp
 (after! hl-todo
@@ -503,6 +503,11 @@ and disable the modeline.
 *** Have <q> exit window                                           :hook:bind:
 #+BEGIN_SRC emacs-lisp
 (add-hook! 'special-mode-hook #'uki/local-remap-q-kills-buffer)
+#+END_SRC
+** Comint
+*** Have <q> exit window                                           :hook:bind:
+#+BEGIN_SRC emacs-lisp
+(add-hook! 'comint-mode-hook #'uki/local-remap-q-kills-buffer)
 #+END_SRC
 * Auto tangle & compile
 My =~/.doom.d/config.org= is a softlink, so depending on if I open a symlink or
