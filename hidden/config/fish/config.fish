@@ -1,4 +1,4 @@
-set -Ux fish_user_paths ~/bin ~/.emacs.d/bin ~/.local/node_modules/.bin ~/.local/bin /opt/bin /sbin /usr/sbin
+set -Ux fish_user_paths ~/bin ~/.emacs.d/bin ~/.local/node_modules/.bin ~/go/bin ~/.local/bin /opt/bin /sbin /usr/sbin
 set -Ux fish_greeting ''
 
 set -gx EDITOR nvim
@@ -13,7 +13,7 @@ set -gx XDG_DOCUMENTS_DIR "$HOME/org/"
 set -gx XDG_MUSIC_DIR "$HOME/m/"
 set -gx XDG_PICTURES_DIR "$HOME/pic/"
 set -gx XDG_VIDEOS_DIR "$HOME/vid/"
-set -gx INFOPATH "~/.local/share/info/:$INFOPATH"
+set -gx INFOPATH "$HOME/.local/share/info/:$INFOPATH"
 
 # don't create `__pycache__` directories
 set -x PYTHONDONTWRITEBYTECODE 'True'

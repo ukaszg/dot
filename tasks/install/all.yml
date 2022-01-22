@@ -2,4 +2,4 @@
 - import_playbook: packages.yml
 - import_playbook: npm.yml
 - import_playbook: python.yml
-- import_playbook: golang-local_packages.yml
+- import_playbook: golang.yml

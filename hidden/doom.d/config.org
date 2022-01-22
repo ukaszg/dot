@@ -36,7 +36,7 @@
 ** Modules configuration (init.el)
 #+BEGIN_SRC emacs-lisp :tangle ~/.doom.d/init.el
 ;;; ~/.doom.d/init.el -*- lexical-binding: t; -*-
-(doom! :completion company (vertico +icons)
+(doom! :completion (company +tng) (vertico +icons)
        :ui         doom doom-dashboard doom-quit
                    hl-todo modeline nav-flash ophints treemacs
                    (popup +all +defaults) vc-gutter vi-tilde-fringe workspaces
@@ -45,12 +45,12 @@
        :term       vterm
        :checkers   syntax
        :tools      ansible debugger (docker +lsp) (eval +overlay)
-                   (lookup +docsets) lsp magit make prodigy upload
+                   (lookup +docsets) (lsp +peek) magit make prodigy upload
        :os         tty
        :lang       (cc +lsp) data emacs-lisp (go +lsp) (java +lsp)
                    (javascript +lsp) (json +lsp) lua markdown org (python +lsp)
                    rest (sh +fish +lsp) (web +lsp) (yaml +lsp)
-       :config     literate (default +bindings +smartparens))
+       :config     literate (default +bindings))
 #+END_SRC
 ** *HACKS*
 *** fix defvaralias eldoc-documentation-function                   :setq:hack:
@@ -132,9 +132,9 @@ take note that doom-emacs doesn't yet support emacs version 28
   (setq! hl-todo-color-background t))
 #+END_SRC
 ** Electric Pair Mode
-*** Disable smartparens                                                 :hook:
+*** Disable smartparens                                        :disabled:hook:
 I like electric-pair-mode.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
 (remove-hook 'doom-first-buffer-hook #'smartparens-global-mode)
 #+END_SRC
 *** Be conservative                                                     :setq:
@@ -153,7 +153,7 @@ I like electric-pair-mode.
 #+BEGIN_SRC emacs-lisp
 (after! doom-modeline
   (let ((graphic-p (display-graphic-p)))
-    (setq! doom-modeline-height 20
+    (setq! doom-modeline-height 22
            doom-modeline-unicode-fallback t
            doom-modeline-icon graphic-p
            doom-modeline-major-mode-icon graphic-p
@@ -215,23 +215,6 @@ I like electric-pair-mode.
       "<up>"    #'evil-window-up
       "<down>"  #'evil-window-down)
 #+END_SRC
-** Ivy
-*** Preview (virtual/file) buffers when switching                       :setq:
-#+BEGIN_SRC emacs-lisp
-(after! ivy
-  (setq! +ivy-buffer-preview 'everything))
-#+END_SRC
-*** Ignore some buffers while switching                                 :setq:
-- =*Messages*= are bound under <SPC h e>
-- =*Org Src...*= automatically displays upon selecting org file
-- =*scratch*= is bound under <SPC x>
-#+BEGIN_SRC emacs-lisp
-(after! ivy
-  (setq! ivy-ignore-buffers '("^ " "^\\*helpful" "^\\*Compile" "^\\*doom\\*$"
-                              "^\\*Messages\\*$" "^\\*scratch\\*$" "^\\*eldoc\\*$"
-                              "^\\ ?*EGLOT" "^\\*Buffer List\\*$"
-                              "^\\*Org Src" "^\\*tramp" "^\\*refs:")))
-#+END_SRC
 * Major-modes
 ** Prog-mode
 *** <C-x =>/<SPC c => Align your code in a pretty way                   :bind:
@@ -271,17 +254,27 @@ I like electric-pair-mode.
       [remap dired-up-directory] #'uki/up-directory-alternative)
 #+END_SRC
 *** Permanent ~dired-hide-details-mode~                                 :bind:
-TODO: persist details state between restarts
 #+BEGIN_SRC emacs-lisp
+(defun uki/init-permanent-dired-hide-details-mode (sym exp)
+  "Restore saved mode state or set a new value."
+  (custom-initialize-reset sym exp)
+  (when (eq major-mode 'dired-mode) (dired-hide-details-mode exp))
+  (if exp
+      (add-hook 'dired-mode-hook #'dired-hide-details-mode)
+    (remove-hook 'dired-mode-hook #'dired-hide-details-mode)))
+
+(defcustom uki/permanent-dired-hide-details-mode-state nil
+  "State of `dired-hide-details-mode' saved between restarts."
+  :group 'user
+  :type 'bool
+  :initialize #'uki/init-permanent-dired-hide-details-mode)
+
 (defun uki/toggle-permanent-dired-hide-details-mode ()
   "Toggles `dired-hide-details-mode' for current and future dired buffers."
   (interactive)
-  (if (memq #'dired-hide-details-mode dired-mode-hook)
-      (progn
-        (dired-hide-details-mode -1)
-        (remove-hook 'dired-mode-hook #'dired-hide-details-mode))
-    (dired-hide-details-mode +1)
-    (add-hook 'dired-mode-hook #'dired-hide-details-mode)))
+  (uki/init-permanent-dired-hide-details-mode
+   'uki/permanent-dired-hide-details-mode-state
+   (not uki/permanent-dired-hide-details-mode-state)))
 
 (map! :after dired :map dired-mode-map
       (:localleader :desc "Hide-Details" "d" #'uki/toggle-permanent-dired-hide-details-mode)
@@ -325,27 +318,21 @@ Why so complicated? [[https://nullprogram.com/blog/2019/12/10/#cl-first]]
          (conf-dir (concat root-dir "config/"))
          (doompath (expand-file-name "hidden/doom.d/" uki/dotfiles-dir)))
     (setq! org-publish-project-alist
-           `(("gruner.lu/kasz/config" :components ("config-static-resources" "config.html" "favicon.ico"))
-             ("favicon.ico"
-              :base-directory ,doompath
-              :publishing-directory ,root-dir
-              :publishing-function org-publish-attachment
-              :include ("favicon.ico")
-              :exclude ".*")
+           `(("gruner.lu/kasz/config" :components ("config-static-resources" "config/index.html"))
              ("config-static-resources"
               :base-directory ,doompath
               :publishing-directory ,conf-dir
               :publishing-function org-publish-attachment
-              :include ("config.css" "Droid_Sans_Mono.woff2")
+              :include ("favicon.ico" "config.css" "Droid_Sans_Mono.woff2")
               :exclude ".*")
-             ("config.html" ;file name will be index.html (see header)
+             ("config/index.html"
               :base-directory ,doompath
               :include ("config.org")
               :exclude ".*"
               :publishing-directory ,conf-dir
               :html-postamble nil
               :publishing-function org-html-publish-to-html
-              :keywords "config.org, doom literate config, init.el"
+              :keywords "config.org, doom-literate-config, init.el"
               :html-doctype "html5"
               :html-html5-fancy t)))))
 #+END_SRC
@@ -366,8 +353,10 @@ Why so complicated? [[https://nullprogram.com/blog/2019/12/10/#cl-first]]
 *** Have =org-src= buffers be managed by orgmode                  :setq:popup:
 #+BEGIN_SRC emacs-lisp
 (after! org
-  (setq! org-src-window-setup 'current-window))
-(set-popup-rule! "^\\*Org Src" :ignore t)
+  (setq! org-src-window-setup 'current-window)
+  (set-popup-rule! "^\\*Org Src"
+    :actions '(display-buffer-same-window)
+    :quit nil :select t :autosave t :modeline nil :ttl nil))
 #+END_SRC
 *** Enable and fix =org-eldoc=                                   :advice:hook:
 DOOM doesn't use stock Eldoc which causes =org-eldoc= to assume
@@ -382,8 +371,7 @@ So I bind old documentation function to new handles.
                (defun uki/enable-org-eldoc-h (&rest _)
                  "Setup `eldoc-documentation-function' and enable `org-eldoc-mode'."
                  (interactive)
-                 (setq-local eldoc-documentation-strategy
-                             'eldoc-documentation-default)
+                 (setq-local eldoc-documentation-strategy 'eldoc-documentation-default)
                  (add-function :before-until (local 'eldoc-documentation-function)
                                #'org-eldoc-documentation-function)
                  (puthash "org"
@@ -449,13 +437,39 @@ and disable the modeline.
 ** Java
 *** Set ~compile-command~ to maven                                 :hook:setq:
 #+BEGIN_SRC emacs-lisp
-(setq-hook! 'java-mode-hook
-  compile-command "mvn clean install -DskipTests")
+(add-hook! 'java-mode-hook
+  (defun uki/set-mvn-cc ()
+    (setq-local compile-command "mvn clean install -DskipTests")))
 #+END_SRC
 *** Use long lines                                                 :hook:setq:
 #+BEGIN_SRC emacs-lisp
 (setq-hook! 'java-mode-hook
   fill-column 160)
+#+END_SRC
+*** Load formatter configuration if present
+#+BEGIN_SRC emacs-lisp
+(after! lsp-java
+  (let ((formatter (expand-file-name "~/.formatter.xml")))
+    (when (file-exists-p formatter)
+      (setq! lsp-java-format-enabled t
+             lsp-java-format-settings-url formatter))))
+#+END_SRC
+*** Always use code blocks
+#+BEGIN_SRC emacs-lisp
+(after! lsp-java
+  (setq! lsp-java-code-generation-use-blocks t))
+#+END_SRC
+*** LSP vm args
+#+BEGIN_SRC emacs-lisp
+(after! lsp-java
+  (setq! lsp-java-vmargs
+         '("-noverify -XX:UseParallelGC" "-XX:GCTimeRatio=4" "-XX:AdaptiveSizePolicyWeight=90"
+           "-Dsun.zip.disableMemoryMapping=true" "-Xmx4G" "-Xms256m" "-XX:+UseStringDeduplication")))
+#+END_SRC
+*** LSP java executable
+#+BEGIN_SRC emacs-lisp
+(after! lsp-java
+  (setq! lsp-java-java-path (executable-find "javaw.exe")))
 #+END_SRC
 ** Compilation
 *** Have <q> exit window                                           :hook:bind:
