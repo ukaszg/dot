@@ -318,51 +318,12 @@ Why so complicated? [[https://nullprogram.com/blog/2019/12/10/#cl-first]]
 (after! org
   (setq! org-return-follows-link t))
 #+END_SRC
-*** Support for Google Analytics in html publishing                     :hook:
-Stolen from [[https://raw.githubusercontent.com/takaishi/.emacs.d/master/conf.d/30_org-mode.org][takaishi/.emacs.d]]
-#+BEGIN_SRC emacs-lisp
-(defun uki/add-google-analytics-h (orig-file result-file)
-  "Adds Google Analytics Tracking code."
-  (let* ((project-plist (cdr (org-publish-get-project-from-filename orig-file)))
-         (code (plist-get project-plist :google-analytics-tracking-code)))
-    (when (and code (string= org-html-extension (file-name-extension result-file)))
-      (let (post-command-hook
-            kill-buffer-query-functions
-            before-save-hook
-            after-save-hook)
-        (with-current-buffer (find-file-noselect result-file t)
-          (goto-char (point-min))
-          (re-search-forward "</head>")
-          (goto-char (match-beginning 0))
-          (insert
-           (concat "
-<script type='text/javascript'>
-var _gaq = _gaq || [];
-_gaq.push(['_setAccount', '"
-                   code
-                   "']);
-_gaq.push(['_trackPageview']);
-(function() {
-var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-})();
-</script>
-"))
-          (basic-save-buffer)
-          (kill-buffer))
-        (message "Added GA script.")
-        (sleep-for 1)))))
-
-(after! org
-  (add-hook 'org-publish-after-publishing-hook #'uki/add-google-analytics-h))
-#+END_SRC
 *** Publishing                                                          :setq:
 #+BEGIN_SRC emacs-lisp
 (after! ox-publish
-  (let ((root-dir "/davs:ukaszg@fastmail.fm@myfiles.fastmail.com:/www/")
-        (conf-dir "/davs:ukaszg@fastmail.fm@myfiles.fastmail.com:/www/config/")
-        (doompath (expand-file-name "hidden/doom.d/" uki/dotfiles-dir)))
+  (let* ((root-dir "/davs:ukaszg@fastmail.fm@myfiles.fastmail.com:/www/")
+         (conf-dir (concat root-dir "config/"))
+         (doompath (expand-file-name "hidden/doom.d/" uki/dotfiles-dir)))
     (setq! org-publish-project-alist
            `(("gruner.lu/kasz/config" :components ("config-static-resources" "config.html" "favicon.ico"))
              ("favicon.ico"
@@ -384,7 +345,6 @@ var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga
               :publishing-directory ,conf-dir
               :html-postamble nil
               :publishing-function org-html-publish-to-html
-              :google-analytics-tracking-code "UA-179015086-1"
               :keywords "config.org, doom literate config, init.el"
               :html-doctype "html5"
               :html-html5-fancy t)))))
@@ -408,37 +368,6 @@ var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga
 (after! org
   (setq! org-src-window-setup 'current-window))
 (set-popup-rule! "^\\*Org Src" :ignore t)
-#+END_SRC
-*** Display =org-src= buffer instead of '.org' file              :advice:hook:
-By default in Doom when =org-src= buffers loose focus they
-can't be switched to easily. This will always show =org-src=
-buffer instead of orgmode if any such buffer is open.
-#+BEGIN_SRC emacs-lisp
-(defun uki/maybe-select-org-src-buffer-instead (&rest _)
-  "In org-mode, switch to this file's org-src buffer if present."
-  (when (eq major-mode 'org-mode)
-    (let ((regexp  (concat "^\\*Org Src " (buffer-name) "\\["))
-          (buffers (buffer-list))
-          doom-switch-buffer-hook
-          buf)
-      (while (setq buf (pop buffers))
-        (when (string-match-p regexp (buffer-name buf))
-          (setq buffers nil)
-          (set-window-buffer (selected-window) buf))))))
-
-(defadvice! uki/enable-select-org-src-buffer-instead-a (&rest _)
-  "Turns on auto-selecting org-src buffer."
-  :after #'org-edit-src-code
-  (add-hook 'doom-switch-buffer-hook #'uki/maybe-select-org-src-buffer-instead)
-  (advice-add 'bury-buffer :after #'uki/maybe-select-org-src-buffer-instead)
-  (advice-add 'kill-current-buffer :after #'uki/maybe-select-org-src-buffer-instead))
-
-(defadvice! uki/disable-select-org-src-buffer-instead-a (&rest _)
-  "Turns off auto-selecting org-src buffer."
-  :before #'org-edit-src-exit
-  (remove-hook 'doom-switch-buffer-hook #'uki/maybe-select-org-src-buffer-instead)
-  (advice-remove 'bury-buffer #'uki/maybe-select-org-src-buffer-instead)
-  (advice-remove 'kill-current-buffer #'uki/maybe-select-org-src-buffer-instead))
 #+END_SRC
 *** Enable and fix =org-eldoc=                                   :advice:hook:
 DOOM doesn't use stock Eldoc which causes =org-eldoc= to assume
@@ -527,6 +456,13 @@ and disable the modeline.
 #+BEGIN_SRC emacs-lisp
 (setq-hook! 'java-mode-hook
   fill-column 160)
+#+END_SRC
+** Compilation
+*** Have <q> exit window                                           :hook:bind:
+#+BEGIN_SRC emacs-lisp
+(add-hook! 'compilation-mode-hook
+  (defun uki/in-compilation-mode-q-closes-window-hook ()
+    (define-key evil-normal-state-local-map (kbd "q") #'delete-window)))
 #+END_SRC
 * Auto tangle & compile
 My =~/.doom.d/config.org= is a softlink, so depending on if I open a symlink or
