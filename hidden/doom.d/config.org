@@ -40,7 +40,7 @@
 ** Modules configuration (init.el)
 #+BEGIN_SRC emacs-lisp :tangle ~/.doom.d/init.el
 ;;; ~/.doom.d/init.el -*- lexical-binding: t; -*-
-(doom! :completion (company +tng) (vertico +icons)
+(doom! :completion (company -tng) (vertico +icons)
        :ui         doom doom-dashboard doom-quit
                    hl-todo modeline nav-flash ophints treemacs
                    (popup +all +defaults) vc-gutter vi-tilde-fringe workspaces
@@ -486,13 +486,8 @@ and disable the modeline.
 #+BEGIN_SRC emacs-lisp
 (after! lsp-java
   (setq! lsp-java-vmargs
-         '("-noverify -XX:UseParallelGC" "-XX:GCTimeRatio=4" "-XX:AdaptiveSizePolicyWeight=90"
-           "-Dsun.zip.disableMemoryMapping=true" "-Xmx4G" "-Xms256m" "-XX:+UseStringDeduplication")))
-#+END_SRC
-*** LSP java executable
-#+BEGIN_SRC emacs-lisp
-(after! lsp-java
-  (setq! lsp-java-java-path (executable-find "javaw.exe")))
+         '("-XX:UseParallelGC" "-XX:GCTimeRatio=4" "-XX:AdaptiveSizePolicyWeight=90"
+           "-Dsun.zip.disableMemoryMapping=true" "-Xmx2G" "-Xms512m" "-XX:+UseStringDeduplication")))
 #+END_SRC
 ** Compilation
 *** Have <q> exit window                                           :hook:bind:
@@ -509,6 +504,7 @@ and disable the modeline.
 #+BEGIN_SRC emacs-lisp
 (add-hook! 'comint-mode-hook #'uki/local-remap-q-kills-buffer)
 #+END_SRC
+
 * Auto tangle & compile
 My =~/.doom.d/config.org= is a softlink, so depending on if I open a symlink or
 concrete file, ~+literate-enable-recompile-h~ might not recognize it as literate config.

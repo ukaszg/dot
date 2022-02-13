@@ -1,6 +1,7 @@
 let g:zenburn_subdued_LineNr=1
 call plug#begin('~/.config/nvim/plug')
 Plug 'jnurmine/Zenburn'
+Plug 'nelstrom/vim-visual-star-search'
 call plug#end()
 
 if !exists("autocommands_loaded")

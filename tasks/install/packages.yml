@@ -44,6 +44,7 @@
           - docker-ce
           - docker-ce-cli
           - docker-compose
+          - dos2unix
           - emacs27
           - emacs27-el
           - fakeroot

@@ -4,6 +4,7 @@
     home: "/home/uki/"
     hidden_dir: "{{ home }}src/dot/hidden/"
     files_dir: "{{ home }}src/dot/files/"
+    mnt: "/mnt/c/Users/uki"
   module_defaults:
     file:
       state: link
@@ -49,6 +50,19 @@
 
     - name: Create directory for nvim backups
       file:
-        path: ~/.local/share/nvim/backup/
+        path: "{{ home }}/.local/share/nvim/backup/"
         state: directory
         mode: '0750'
+
+    - name: Link to windows
+      file:
+        src: "{{ mnt }}"
+        dest: "{{ home }}/mnt"
+        state: link
+
+    - name: Link to windows' .m2
+      file:
+        src: "{{ mnt }}/.m2"
+        dest: "{{ home }}/.m2"
+        state: link
+
