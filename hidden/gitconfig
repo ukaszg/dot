@@ -32,8 +32,7 @@
   st = status
   ci = commit
   co = checkout
-  up = pull
-  pr = pull --rebase 
+  up = pull --rebase 
   glog = log --pretty=format:\"%C(yellow)%h%C(reset) %C(green)%ad%C(reset) %C(red)|%C(reset) %s %C(bold blue)[%an]%C(reset)%C(yellow)%d%C(reset)\" --graph --date=short
   prune = fetch --prune
   conflicts = !git diff --name-only --diff-filter=U | sort -u | xargs $EDITOR

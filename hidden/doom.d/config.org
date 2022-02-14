@@ -53,7 +53,7 @@
        :os         tty
        :lang       (cc +lsp) data emacs-lisp (go +lsp) (java +lsp)
                    (javascript +lsp) (json +lsp) lua markdown org (python +lsp)
-                   rest (sh +fish +lsp) (web +lsp) (yaml +lsp)
+                   rest (rust +lsp) (sh +fish +lsp) (web +lsp) (yaml +lsp)
        :config     literate (default +bindings))
 #+END_SRC
 ** *HACKS*
