@@ -63,7 +63,7 @@ take note that doom-emacs doesn't yet support emacs version 28
 #+BEGIN_SRC emacs-lisp
 (defvar eldoc-documentation-strategy 'eldoc-documentation-default "Now defvaralias won't fail.")
 #+END_SRC
-** My LIB
+** My Library of useful stuff
 *** Locally remap q to exit buffer
 Some modes don't require macros (like most RO buffers).
 #+BEGIN_SRC emacs-lisp
@@ -96,7 +96,8 @@ Some modes don't require macros (like most RO buffers).
 
 (defconst uki/ellipsis "…" "Ellipsis.")
 #+END_SRC
-*** Authinfo file                                                       :setq:
+*** Authinfo
+**** file location                                                     :setq:
 #+BEGIN_SRC emacs-lisp
 (after! auth-source
   (setq! auth-sources (list (concat uki/dotfiles-dir "hidden/authinfo.gpg"))))
@@ -107,7 +108,7 @@ Some modes don't require macros (like most RO buffers).
 #+END_SRC
 *** Make scripts executable on save                                     :hook:
 #+BEGIN_SRC emacs-lisp
-(add-hook 'after-save-hook
+(add-hook! 'after-save-hook
           #'executable-make-buffer-file-executable-if-script-p)
 #+END_SRC
 *** *<mouse-1>* should follow links                                     :setq:
@@ -157,7 +158,7 @@ Some modes don't require macros (like most RO buffers).
 #+BEGIN_SRC emacs-lisp
 (declare-function electric-pair-local-mode "elec-pair" (&optional arg))
 (after! elec-pair
-  (add-hook 'prog-mode-hook #'electric-pair-local-mode))
+  (add-hook! 'prog-mode-hook #'electric-pair-local-mode))
 #+END_SRC
 *** Define pairs                                                        :hook:
 #+BEGIN_SRC emacs-lisp
@@ -237,7 +238,7 @@ Some modes don't require macros (like most RO buffers).
 ** Messages-Buffer
 *** <q> exits buffer/window
 #+BEGIN_SRC emacs-lisp
-(add-hook 'messages-buffer-mode-hook #'uki/local-remap-q-kills-buffer)
+(add-hook! 'messages-buffer-mode-hook #'uki/local-remap-q-kills-buffer)
 #+END_SRC
 ** Prog
 *** <C-x =>/<SPC c => Align your code in a pretty way                   :bind:
@@ -283,8 +284,8 @@ Some modes don't require macros (like most RO buffers).
   (custom-initialize-reset sym exp)
   (when (eq major-mode 'dired-mode) (dired-hide-details-mode exp))
   (if exp
-      (add-hook 'dired-mode-hook #'dired-hide-details-mode)
-    (remove-hook 'dired-mode-hook #'dired-hide-details-mode)))
+      (add-hook! 'dired-mode-hook #'dired-hide-details-mode)
+    (remove-hook! 'dired-mode-hook #'dired-hide-details-mode)))
 
 (defcustom uki/permanent-dired-hide-details-mode-state nil
   "State of `dired-hide-details-mode' saved between restarts."
@@ -473,9 +474,10 @@ and disable the modeline.
 #+BEGIN_SRC emacs-lisp
 (after! lsp-java
   (let ((formatter (expand-file-name "~/.formatter.xml")))
-    (when (file-exists-p formatter)
+    (if (file-exists-p formatter)
       (setq! lsp-java-format-enabled t
-             lsp-java-format-settings-url formatter))))
+             lsp-java-format-settings-url formatter)
+      (message "No formatter file present: %s" formatter))))
 #+END_SRC
 *** Always use code blocks
 #+BEGIN_SRC emacs-lisp
@@ -515,7 +517,7 @@ As a workaround I disable literate autotangle.
   (remove-hook 'org-mode-hook #'+literate-enable-recompile-h))
 #+END_SRC
 
-And then add following at the end of =config.org= (will also [re]compile tangled files).
+And then add following at the end of =config.org= (this will also compile tangled files).
 : # Local Variables:
 : # eval: (add-hook 'after-save-hook (lambda () (org-babel-tangle) (byte-recompile-directory doom-private-dir 0 t)) nil t)
 : # End:
