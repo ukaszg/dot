@@ -1,7 +1,6 @@
-#+TITLE: Readme
+#+TITLE: This are my dotfiles
 #+AUTHOR: Łukasz Gruner
 
-* This are my dotfiles
 Dotfiles are kept in a separate repository in =~/src/dot/=.
 You need [[https://ansible.org/][Ansible]] and [[https://git-scm.com/][Git]] to install this configuration.
 Instalation is done by softlinking files in this repo to your *$HOME*. It is done in [[tasks/link-configuration.yml]] file.
