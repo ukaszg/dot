@@ -41,11 +41,11 @@
                    hl-todo modeline nav-flash ophints treemacs
                    (popup +all +defaults) vc-gutter vi-tilde-fringe workspaces
        :editor     (evil +everywhere) file-templates fold format snippets word-wrap
-       :emacs      (dired +icons) (ibuffer +icons) undo vc
+       :emacs      (dired +icons) electric (ibuffer +icons) undo vc
        :term       vterm
        :checkers   syntax
        :tools      ansible debugger (docker +lsp) (eval +overlay)
-                   (lookup +docsets) (lsp +peek) magit make prodigy upload
+                   (lookup +docsets) (lsp +peek) magit make prodigy taskrunner upload
        :os         tty
        :lang       (cc +lsp) data emacs-lisp (go +lsp) (java +lsp)
                    (javascript +lsp) (json +lsp) lua markdown org (python +lsp)
@@ -143,25 +143,6 @@ Some modes don't require macros (like most RO buffers).
 #+begin_src emacs-lisp
 (after! hl-todo
   (setq! hl-todo-color-background t))
-#+end_src
-** Electric-Pair
-*** Be conservative                                                     :setq:
-#+begin_src emacs-lisp
-(after! elec-pair
-  (setq! electric-pair-inhibit-predicate #'electric-pair-conservative-inhibit))
-#+end_src
-*** Run in prog-mode derivatives                                        :hook:
-#+begin_src emacs-lisp
-(declare-function electric-pair-local-mode "elec-pair" (&optional arg))
-(after! elec-pair
-  (add-hook! 'prog-mode-hook #'electric-pair-local-mode))
-#+end_src
-*** Define pairs                                                        :hook:
-#+begin_src emacs-lisp
-(declare-function electric-pair-local-mode "elec-pair" (&optional arg))
-(after! elec-pair
-  (setq! electric-pair-text-pairs `((?\" . ?\"))
-         electric-pair-pairs `((?\" . ?\"))))
 #+end_src
 ** Doom-Modeline
 *** Use icons in graphic mode                                           :setq:

@@ -1,0 +1,14 @@
+#+TITLE: Readme
+#+AUTHOR: Łukasz Gruner
+
+* This are my dotfiles
+Dotfiles are kept in a separate repository in =~/src/dot/=.
+You need [[https://ansible.org/][Ansible]] and [[s][Git]] to install this configuration.
+Instalation is done by softlinking files in this repo to your *$HOME*. It is done in [tasks/link-configuration.yaml] file.
+#+begin_src sh
+sudo apt install ansible, git
+cd ~/src/dot/
+ansible-playbook tasks/link-configuration.yaml
+#+end_src
+
+To perform full installation use [[tasks/main.yaml]].
