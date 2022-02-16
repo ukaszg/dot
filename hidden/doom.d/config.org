@@ -520,5 +520,5 @@ As a workaround I disable literate autotangle.
 
 And then add following at the end of =config.org= (this will also compile tangled files).
 : # Local Variables:
-: # eval: (add-hook 'after-save-hook (lambda () (org-babel-tangle) (byte-recompile-directory doom-private-dir 0 t)) nil t)
+: # eval: (add-hook! 'after-save-hook (progn (org-babel-tangle) (byte-recompile-directory doom-private-dir 0 t)) nil t)
 : # End:
