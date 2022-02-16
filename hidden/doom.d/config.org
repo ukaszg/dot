@@ -14,31 +14,27 @@
 * =*DOOM*=
 ** Add file headers
 *** for =config.el=
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 ;;; ~/.doom.d/config.el -*- lexical-binding: t; -*-
-#+END_SRC
+#+end_src
 *** and =packages.el=
-#+BEGIN_SRC emacs-lisp :tangle ~/.doom.d/packages.el
+#+begin_src emacs-lisp :tangle ~/.doom.d/packages.el
 ;;; ~/.doom.d/packages.el -*- no-byte-compile: t; lexical-binding: t; -*-
-(package! org-ql
-  :recipe (:host github
-           :repo "alphapapa/org-ql"
-           :files (:defaults (:exclude "helm-org-ql.el"))))
-#+END_SRC
+#+end_src
 *** load or create =custom.el=                                          :setq:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq! custom-file (expand-file-name "custom.el" doom-private-dir))
 (if (file-exists-p custom-file)
     (load custom-file)
   (with-temp-file custom-file
     (insert ";;; ~/.doom.d/custom.el -*- no-byte-compile: t; lexical-binding: t; -*-\n")))
-#+END_SRC
+#+end_src
 *** ask about unsaved customizations
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (add-hook! 'kill-emacs-query-functions #'custom-save-all)
-#+END_SRC
+#+end_src
 ** Modules configuration (init.el)
-#+BEGIN_SRC emacs-lisp :tangle ~/.doom.d/init.el
+#+begin_src emacs-lisp :tangle ~/.doom.d/init.el
 ;;; ~/.doom.d/init.el -*- lexical-binding: t; -*-
 (doom! :completion (company -tng) (vertico +icons)
        :ui         doom doom-dashboard doom-quit
@@ -55,121 +51,121 @@
                    (javascript +lsp) (json +lsp) lua markdown org (python +lsp)
                    rest (rust +lsp) (sh +fish +lsp) (web +lsp) (yaml +lsp)
        :config     literate (default +bindings))
-#+END_SRC
+#+end_src
 ** *HACKS*
 *** fix defvaralias eldoc-documentation-function                   :setq:hack:
 conflict between eldoc version from emacs28 (installed by doom) and emacs version 27.1
 take note that doom-emacs doesn't yet support emacs version 28
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (defvar eldoc-documentation-strategy 'eldoc-documentation-default "Now defvaralias won't fail.")
-#+END_SRC
+#+end_src
 ** My Library of useful stuff
 *** Locally remap q to exit buffer
 Some modes don't require macros (like most RO buffers).
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (defun uki/local-remap-q-kills-buffer ()
   (define-key evil-normal-state-local-map (kbd "q") #'kill-current-buffer))
-#+END_SRC
+#+end_src
 * Minor-modes
 ** =Builtin= and one-liners
 *** Personal info                                                       :setq:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq! user-full-name    "Łukasz Gruner"
        user-mail-address "lukasz@gruner.lu")
-#+END_SRC
+#+end_src
 *** Set theme & font                                            :package:setq:
 ~doom-zenburn-theme~ is installed by =:ui doom=
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq! doom-theme               'doom-zenburn
        doom-variable-pitch-font "DejaVu Sans:size=12"
        doom-font                "Terminus:size=16"
        doom-big-font            "Terminus:size=22")
-#+END_SRC
+#+end_src
 *** Start maximized
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
-#+END_SRC
+#+end_src
 *** Define const vars                                                   :setq:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (defconst uki/dotfiles-dir "~/src/dot/" "Dotfiles repository root.")
 
 (defconst uki/ellipsis "…" "Ellipsis.")
-#+END_SRC
+#+end_src
 *** Authinfo
 **** file location                                                     :setq:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (after! auth-source
-  (setq! auth-sources (list (concat uki/dotfiles-dir "hidden/authinfo.gpg"))))
-#+END_SRC
+  (setq! auth-sources (list (expand-file-name "hidden/authinfo.gpg" uki/dotfiles-dir))))
+#+end_src
 *** If '.elc' file is outdated load an uncompiled '.el' file instead    :setq:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq! load-prefer-newer t)
-#+END_SRC
+#+end_src
 *** Make scripts executable on save                                     :hook:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (add-hook! 'after-save-hook
           #'executable-make-buffer-file-executable-if-script-p)
-#+END_SRC
+#+end_src
 *** *<mouse-1>* should follow links                                     :setq:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq! mouse-1-click-follows-link t)
-#+END_SRC
+#+end_src
 *** Enable ~+global-word-wrap-mode~
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (after! (:and simple adaptive-wrap)
   (+global-word-wrap-mode +1))
-#+END_SRC
+#+end_src
 *** Only highlight trailing whitespace when coding                 :hook:setq:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (add-hook! '(prog-mode-hook org-mode-hook)
   (defun uki/set-whitespace-style-to-trailing-space-h ()
     "Set local value for `whitespace-style'."
     (setq-local whitespace-style '(face trailing))))
-#+END_SRC
+#+end_src
 ** Persp
 *** Kill buffers removed from workspace and empty workspaces            :setq:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (after! persp-mode
   (setq! persp-autokill-buffer-on-remove 'kill
          persp-autokill-persp-when-removed-last-buffer 'kill))
-#+END_SRC
+#+end_src
 ** Hl-Todo
 *** Setup colors/faces                                                  :setq:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (after! hl-todo
   (setq! hl-todo-keyword-faces `(("TODO" font-lock-warning-face bold)
                                  ("FIXME" error bold)
                                  ("HACK" font-lock-keyword-face bold)
                                  ("XXX" font-lock-doc-face bold))))
-#+END_SRC
+#+end_src
 *** Highlight background                                                :setq:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (after! hl-todo
   (setq! hl-todo-color-background t))
-#+END_SRC
+#+end_src
 ** Electric-Pair
 *** Be conservative                                                     :setq:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (after! elec-pair
   (setq! electric-pair-inhibit-predicate #'electric-pair-conservative-inhibit))
-#+END_SRC
+#+end_src
 *** Run in prog-mode derivatives                                        :hook:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (declare-function electric-pair-local-mode "elec-pair" (&optional arg))
 (after! elec-pair
   (add-hook! 'prog-mode-hook #'electric-pair-local-mode))
-#+END_SRC
+#+end_src
 *** Define pairs                                                        :hook:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (declare-function electric-pair-local-mode "elec-pair" (&optional arg))
 (after! elec-pair
   (setq! electric-pair-text-pairs `((?\" . ?\"))
          electric-pair-pairs `((?\" . ?\"))))
-#+END_SRC
+#+end_src
 ** Doom-Modeline
 *** Use icons in graphic mode                                           :setq:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (after! doom-modeline
   (let ((graphic-p (display-graphic-p)))
     (setq! doom-modeline-height 22
@@ -180,20 +176,20 @@ Some modes don't require macros (like most RO buffers).
            doom-modeline-buffer-state-icon graphic-p
            doom-modeline-buffer-modification-icon graphic-p
            doom-modeline-modal-icon graphic-p)))
-#+END_SRC
+#+end_src
 *** Don't upscale icon font                                             :setq:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (after! all-the-icons
   (setq! all-the-icons-scale-factor 1.0))
-#+END_SRC
+#+end_src
 *** Truncate ~buffer-file-name~ up to project                           :setq:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (after! doom-modeline
   (setq! doom-modeline-buffer-file-name-style 'truncate-upto-project))
-#+END_SRC
+#+end_src
 ** Evil
 *** <C-w M-(direction)> Swap buffers by direction                       :bind:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (defmacro uki/window-swap-action (cmd)
   "Return defun which invokes `CMD' to switch window and than swaps buffer with previous window."
   (let ((func-sym (intern (format "uki/swap-buffers-using--%s" cmd))))
@@ -220,43 +216,43 @@ Some modes don't require macros (like most RO buffers).
       "<M-right>" (uki/window-swap-action evil-window-right)
       "M-h"       (uki/window-swap-action evil-window-left)
       "<M-left>"  (uki/window-swap-action evil-window-left))
-#+END_SRC
+#+end_src
 *** Always use windows <C-w> bindings                                   :setq:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (after! evil
   (setq! evil-want-C-w-in-emacs-state t))
-#+END_SRC
+#+end_src
 *** Also use arrows for switching windows                               :bind:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (map! :after evil :map evil-window-map
       "<left>"  #'evil-window-left
       "<right>" #'evil-window-right
       "<up>"    #'evil-window-up
       "<down>"  #'evil-window-down)
-#+END_SRC
+#+end_src
 * Major-modes
 ** Messages-Buffer
 *** <q> exits buffer/window
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (add-hook! 'messages-buffer-mode-hook #'uki/local-remap-q-kills-buffer)
-#+END_SRC
+#+end_src
 ** Prog
 *** <C-x =>/<SPC c => Align your code in a pretty way                   :bind:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (map! :map prog-mode-map
       "C-x =" #'align-regexp
       (:leader :prefix ("c" "+code")
         :desc "Align regexp" "=" #'align-regexp))
-#+END_SRC
+#+end_src
 *** Highlight trailing whitespace                                  :hook:setq:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (add-hook! 'prog-mode-hook (defun uki/set-trailing-whitespace-h ()
                              "Set `show-trailing-whitespace'."
                              (setq! show-trailing-whitespace t)))
-#+END_SRC
+#+end_src
 ** Dired
 *** Reuse current dired buffer when changing directories                :bind:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (defun uki/up-directory-alternative ()
   "Use single instance of dired buffer when going up a directory."
   (interactive)
@@ -276,9 +272,9 @@ Some modes don't require macros (like most RO buffers).
 (map! :after dired :map dired-mode-map
       [remap dired-find-file]    #'uki/find-alt-file-for-directories
       [remap dired-up-directory] #'uki/up-directory-alternative)
-#+END_SRC
+#+end_src
 *** Permanent ~dired-hide-details-mode~                                 :bind:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (defun uki/init-permanent-dired-hide-details-mode (sym exp)
   "Restore saved mode state or set a new value."
   (custom-initialize-reset sym exp)
@@ -303,40 +299,40 @@ Some modes don't require macros (like most RO buffers).
 (map! :after dired :map dired-mode-map
       (:localleader :desc "Hide-Details" "d" #'uki/toggle-permanent-dired-hide-details-mode)
       ([remap dired-hide-details-mode] #'uki/toggle-permanent-dired-hide-details-mode))
-#+END_SRC
+#+end_src
 *** Run dired instead of listing directory
 Why so complicated? [[https://nullprogram.com/blog/2019/12/10/#cl-first]]
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (after! dired
   (defalias 'list-directory 'dired)
   (put 'list-directory 'byte-optimizer 'byte-compile-inline-expand))
-#+END_SRC
+#+end_src
 ** Org
 *** Startup options                                                     :setq:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (after! org
   (setq! org-tags-column -80
          org-startup-indented t
          org-startup-folded t
          org-startup-truncated t
          org-startup-align-all-tables t))
-#+END_SRC
+#+end_src
 *** My ~org-directory~                                                  :setq:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq! org-directory "~/org/")
-#+END_SRC
+#+end_src
 *** Bind ~org-babel-tangle~ under :localleader                          :bind:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (map! :after org :map org-mode-map
       :localleader :desc "Tangle current file" "B" #'org-babel-tangle)
-#+END_SRC
+#+end_src
 *** Follow link under point with <RET>                                  :setq:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (after! org
   (setq! org-return-follows-link t))
-#+END_SRC
+#+end_src
 *** Publishing                                                          :setq:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (after! ox-publish
   (let* ((root-dir "/davs:ukaszg@fastmail.fm@myfiles.fastmail.com:/www/")
          (conf-dir (concat root-dir "config/"))
@@ -359,34 +355,34 @@ Why so complicated? [[https://nullprogram.com/blog/2019/12/10/#cl-first]]
               :keywords "config.org, doom-literate-config, init.el"
               :html-doctype "html5"
               :html-html5-fancy t)))))
-#+END_SRC
+#+end_src
 *** [Flycheck] Disable textlint checker                            :hook:setq:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (after! org
   (add-hook! 'org-mode-hook
     (cl-pushnew 'textlint flycheck-disabled-checkers)))
-#+END_SRC
+#+end_src
 *** Have export dialog open in place and without modeline              :popup:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (after! org
   (require 'ox nil t)
   (set-popup-rule! "^ ?\\*Org Export Dispatcher"
     :actions '(display-buffer-same-window)
     :modeline nil))
-#+END_SRC
+#+end_src
 *** Have =org-src= buffers be managed by orgmode                  :setq:popup:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (after! org
   (setq! org-src-window-setup 'current-window)
   (set-popup-rule! "^\\*Org Src"
     :actions '(display-buffer-same-window)
     :quit nil :select t :autosave t :modeline nil :ttl nil))
-#+END_SRC
+#+end_src
 *** Enable and fix =org-eldoc=                                   :advice:hook:
 DOOM doesn't use stock Eldoc which causes =org-eldoc= to assume
 Emacs is version 28 (with more recent emacs-lisp-mode).
 So I bind old documentation function to new handles.
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (unless (<= 28 emacs-major-version)
   (after! org
     (require 'org-eldoc nil t)
@@ -402,10 +398,15 @@ So I bind old documentation function to new handles.
                           #'org-eldoc-documentation-function
                           org-eldoc-local-functions-cache)
                  (eldoc-mode +1)))))
-#+END_SRC
+#+end_src
+*** Block templates
+#+begin_src emacs-lisp
+(require 'org-tempo)
+(add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+#+end_src
 ** Info
 *** Automatically view '.info' files instead of editing them            :setq:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (add-to-list 'auto-mode-alist
              (cons "\\.[iI][nN][fF][oO]\\'"
                    (defun uki/reopen-file-in-info-mode-h ()
@@ -414,22 +415,22 @@ So I bind old documentation function to new handles.
                      (let ((file-name (buffer-file-name)))
                        (kill-buffer)
                        (info file-name)))))
-#+END_SRC
+#+end_src
 *** Display =*info*= buffers in same window                            :popup:
 and disable the modeline.
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (set-popup-rule! "^\\*info\\*$"
   :actions '(display-buffer-same-window)
   :modeline nil)
-#+END_SRC
+#+end_src
 *** Left mouse button should follow links                               :bind:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (map! :after info :map Info-mode-map
       "<mouse-1>" #'Info-mouse-follow-nearest-node)
-#+END_SRC
+#+end_src
 ** Emacs-Lisp
 *** Eldoc will show 1st line of function documentation                :advice:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (declare-function helpful--docstring "helpful" (sym callable-p))
 
 (defadvice! uki/eldoc-elisp-add-fundoc-a (orig-fn sym &optional index prefix)
@@ -451,71 +452,71 @@ and disable the modeline.
        (- (frame-width) (length orig) 1)
        (concat orig " " (propertize doc 'face 'font-lock-doc-face))
        (concat "[" uki/ellipsis "]")))))
-#+END_SRC
+#+end_src
 *** [Flycheck] Disable elisp-checkdoc                              :hook:setq:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (after! flycheck
   (add-hook! 'emacs-lisp-mode-hook
     (cl-pushnew 'emacs-lisp-checkdoc flycheck-disabled-checkers)))
-#+END_SRC
+#+end_src
 ** Java
 *** Set ~compile-command~ to maven                                 :hook:setq:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (add-hook! 'java-mode-hook
   (defun uki/set-mvn-cc ()
     (setq-local compile-command "mvn clean install -DskipTests")))
-#+END_SRC
+#+end_src
 *** Use long lines                                                 :hook:setq:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq-hook! 'java-mode-hook
   fill-column 160)
-#+END_SRC
+#+end_src
 *** Load formatter configuration if present
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (after! lsp-java
   (let ((formatter (expand-file-name "~/.formatter.xml")))
     (if (file-exists-p formatter)
       (setq! lsp-java-format-enabled t
              lsp-java-format-settings-url formatter)
       (message "No formatter file present: %s" formatter))))
-#+END_SRC
+#+end_src
 *** Always use code blocks
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (after! lsp-java
   (setq! lsp-java-code-generation-use-blocks t))
-#+END_SRC
+#+end_src
 *** LSP vm args
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (after! lsp-java
   (setq! lsp-java-vmargs
          '("-XX:UseParallelGC" "-XX:GCTimeRatio=4" "-XX:AdaptiveSizePolicyWeight=90"
            "-Dsun.zip.disableMemoryMapping=true" "-Xmx2G" "-Xms512m" "-XX:+UseStringDeduplication")))
-#+END_SRC
+#+end_src
 ** Compilation
 *** Have <q> exit window                                           :hook:bind:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (add-hook! 'compilation-mode-hook #'uki/local-remap-q-kills-buffer)
-#+END_SRC
+#+end_src
 ** Special
 *** Have <q> exit window                                           :hook:bind:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (add-hook! 'special-mode-hook #'uki/local-remap-q-kills-buffer)
-#+END_SRC
+#+end_src
 ** Comint
 *** Have <q> exit window                                           :hook:bind:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (add-hook! 'comint-mode-hook #'uki/local-remap-q-kills-buffer)
-#+END_SRC
+#+end_src
 
 * Auto tangle & compile
 My =~/.doom.d/config.org= is a softlink, so depending on if I open a symlink or
 concrete file, ~+literate-enable-recompile-h~ might not recognize it as literate config.
 
 As a workaround I disable literate autotangle.
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (after! org
   (remove-hook 'org-mode-hook #'+literate-enable-recompile-h))
-#+END_SRC
+#+end_src
 
 And then add following at the end of =config.org= (this will also compile tangled files).
 : # Local Variables:
