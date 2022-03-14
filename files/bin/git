@@ -1,0 +1,9 @@
+#!/usr/bin/fish
+
+set -l real_path (readlink -f $PWD)
+
+if test (string sub -l 5 $real_path) = "/mnt/"
+    exec git.exe $argv
+else
+    exec /usr/bin/git $argv
+end

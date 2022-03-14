@@ -66,3 +66,9 @@
         dest: "{{ home }}/.m2"
         state: link
 
+    - name: Copy .gitconfig to windows
+      copy:
+        src: "{{ hidden_dir }}/gitconfig"
+        dest: "{{ mnt }}/.gitconfig"
+        force: yes
+
