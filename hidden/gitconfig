@@ -9,7 +9,7 @@
 [rebase]
     autoStash = true
 [merge]
-    conflictstyle = diff3
+    conflictstyle = merge
 [color]
 	diff = true
 	grep = true
