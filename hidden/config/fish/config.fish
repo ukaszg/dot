@@ -1,12 +1,13 @@
-set -Ux fish_user_paths ~/bin ~/.emacs.d/bin ~/.local/node_modules/.bin ~/go/bin ~/.local/bin /opt/bin /sbin /usr/sbin
+set -Ux fish_user_paths $HOME/bin $HOME/.emacs.d/bin $HOME/.local/node_modules/.bin $HOME/.local/go/bin $HOME/.local/bin /opt/bin /sbin /usr/sbin
 set -Ux fish_greeting ''
 
-set -gx EDITOR nvim
-set -gx VISUAL nvim
+set -gx EDITOR vim
+set -gx VISUAL vim
+set -gx GOPATH "$HOME/.local/go"
 set -gx XDG_CACHE_DIR "$HOME/.cache/"
 set -gx XDG_TEMPLATES_DIR "$HOME/.templates/"
 set -gx XDG_DATA_DIR "$HOME/.local/share/"
-set -gx XDG_DESKTOP_DIR $HOME/.
+set -gx XDG_DESKTOP_DIR /.
 set -gx XDG_DOWNLOAD_DIR "$HOME/incoming/"
 set -gx XDG_PUBLICSHARE_DIR "$HOME/pub/"
 set -gx XDG_DOCUMENTS_DIR "$HOME/org/"

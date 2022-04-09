@@ -1,10 +1,9 @@
 ---
 - hosts: all
   vars:
-    debrepo: "{{ ansible_facts['user_dir'] }}/.local/share/dot/packages"
     packages:
       - golang.org/x/tools/cmd/guru
-      - github.com/motemen/gore/...
+#      - github.com/motemen/gore/...
       - github.com/cweill/gotests/...
       - github.com/nsf/gocode
       - github.com/fatih/gomodifytags
@@ -14,13 +13,7 @@
       command: go build -ldflags='-s -w' -o ~/bin/serve ~/src/dot/src/serve.go
       changed_when: false
 
-    - name: Create directory for a local debian package repo
-      file:
-        path: "{{ debrepo }}"
-        state: directory
-        mode: '0750'
-
-    - name: create local .deb package
+    - name: Instal Go tooling
       shell: go get -v -ldflags='-s -w' "{{ item }}"
       loop: "{{ packages }}"
       changed_when: false

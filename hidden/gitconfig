@@ -21,7 +21,7 @@
 	status = true
 	ui = true
 [core]
-	autocrlf = true
+	autocrlf = input
 [rerere]
   enabled = true
 [transfer]

@@ -4,7 +4,7 @@
     home: "/home/uki/"
     hidden_dir: "{{ home }}src/dot/hidden/"
     files_dir: "{{ home }}src/dot/files/"
-    mnt: "/mnt/c/Users/uki"
+    mnt: "/mnt/c/Users/lukas"
   module_defaults:
     file:
       state: link

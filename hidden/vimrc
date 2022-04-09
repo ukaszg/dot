@@ -1,0 +1,75 @@
+set nocompatible
+let mapleader = "<space>"
+
+" No backup or temp files
+set nobackup
+set nowb
+set noswapfile
+
+" No annoying sound on errors
+set noerrorbells
+set novisualbell
+set t_vb=
+set tm=500
+
+let $LANG='en'
+set langmenu=en
+filetype plugin on
+filetype indent on
+syntax enable
+set encoding=utf8
+set ffs=unix
+
+set ai "Auto indent
+set si "Smart indent
+set wrap "Wrap lines
+
+set history=500
+set hlsearch
+
+let g:zenburn_subdued_LineNr=1
+call plug#begin('~/.vim/plug')
+Plug 'jnurmine/Zenburn'
+Plug 'nelstrom/vim-visual-star-search'
+call plug#end()
+
+if !exists("autocommands_loaded")
+	let autocommands_loaded = 1
+	" Autoinstall plugins
+	au VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
+                \|   PlugInstall --sync | q
+                \| endif
+	" directly go to insert mode when swtich to terminal window
+	au BufEnter * if &buftype == 'terminal' | :startinsert | endif
+	" show _some_ color
+	au BufNewFile,BufRead *.fish set ft=sh
+    " UI stuff
+    au ColorScheme * hi ColorColumn guibg=darkgray ctermbg=8
+    au ColorScheme * set colorcolumn=80
+    au ColorScheme * set cursorline
+    au BufNewFile,BufRead *.yml setlocal sw=2
+    au BufNewFile,BufRead *.yml setlocal ts=2
+endif
+
+set wildmenu
+" Ignore compiled files
+set wildignore=*.o,*~,*.pyc,*.class,*.elc
+if has("win16") || has("win32")
+    set wildignore+=.git\*,.hg\*,.svn\*
+else
+    set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.DS_Store
+endif
+
+set background=dark
+set t_Co=256
+colorscheme zenburn
+
+set sw=4
+set ts=4
+set expandtab
+set smarttab
+set clipboard=unnamed
+set mouse=a
+
+" exit terminal mode
+tnoremap jk <C-\><C-n>

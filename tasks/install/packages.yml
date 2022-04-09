@@ -63,7 +63,6 @@
           - lintian
           - gnutls-bin
           - mc
-          - neovim
           - nodejs
           - pandoc
           - pinentry-gtk2
@@ -80,18 +79,19 @@
           - texlive-fonts-extra
           - texlive-latex-extra
           - tidy
+          - vim
           - xfonts-terminus
           - xfonts-terminus-dos
           - xfonts-terminus-oblique
 
-    - name: Install/update vim-plug for neovim
+    - name: Install/update vim-plug for vim
       shell: |
-          DIR="${HOME}/.local/share/nvim/site/autoload/"
+          DIR="${HOME}/.vim/autoload/"
           mkdir -p "${DIR}"
           curl -fLo "${DIR}/plug.vim" https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
           dos2unix "${DIR}/plug.vim"
           [ -f "${DIR}/plug.vim" ] && exit 0 || exit 1
       args:
-        creates: ~/.local/share/nvim/site/autoload/plug.vim
+        creates: ~/.vim/autoload/plug.vim
         warn: false
       become: false
