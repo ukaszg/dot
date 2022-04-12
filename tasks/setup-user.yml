@@ -28,15 +28,19 @@
           clone: yes
           update: yes
 
+    - name: who am I?
+      shell: "whoami"
+      register: whoami
+
     - name: Set fish as my default shell
       user:
-        name: uki
+        name: "{{ whoami }}"
         shell: /usr/bin/fish
       become: true
 
     - name: Add me to a docker group
       user:
-        name: uki
+        name: "{{ whoami }}"
         groups: docker
         append: yes
       become: true

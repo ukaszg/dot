@@ -1,7 +1,7 @@
 ---
 - hosts: all
   vars:
-    home: "/home/uki/"
+    home: "{{ ansible_facts['user_dir'] }}/"
     hidden_dir: "{{ home }}src/dot/hidden/"
     files_dir: "{{ home }}src/dot/files/"
     mnt: "/mnt/c/Users/lukas"
@@ -48,19 +48,13 @@
         state: link
       loop: "{{ files.files }}"
 
-    - name: Create directory for nvim backups
-      file:
-        path: "{{ home }}/.local/share/nvim/backup/"
-        state: directory
-        mode: '0750'
-
-    - name: Link to windows
+    - name: Link to windows USERPROFILE
       file:
         src: "{{ mnt }}"
         dest: "{{ home }}/mnt"
         state: link
 
-    - name: Link to windows' .m2
+    - name: Link to windows .m2
       file:
         src: "{{ mnt }}/.m2"
         dest: "{{ home }}/.m2"

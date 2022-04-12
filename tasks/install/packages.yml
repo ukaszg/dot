@@ -15,12 +15,10 @@
         repo: ppa:kelleyk/emacs
 
     - name: Add Nodesource gpg-key to Ubuntu
-      become: true
       apt_key:
         url: "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
 
     - name: Add nodejs 14.x repository
-      become: true
       apt_repository:
         repo: "deb https://deb.nodesource.com/node_14.x focal main"
 
@@ -80,17 +78,17 @@
           - texlive-latex-extra
           - tidy
           - vim
+          - wsla
           - xfonts-terminus
           - xfonts-terminus-dos
           - xfonts-terminus-oblique
 
-    - name: Install/update vim-plug for vim
+    - name: Install vim-plug for vim
       shell: |
           DIR="${HOME}/.vim/autoload/"
           mkdir -p "${DIR}"
           curl -fLo "${DIR}/plug.vim" https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
           dos2unix "${DIR}/plug.vim"
-          [ -f "${DIR}/plug.vim" ] && exit 0 || exit 1
       args:
         creates: ~/.vim/autoload/plug.vim
         warn: false
