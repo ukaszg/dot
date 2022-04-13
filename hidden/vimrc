@@ -70,6 +70,7 @@ set expandtab
 set smarttab
 set clipboard=unnamed
 set mouse=a
+set number
 
 " exit terminal mode
 tnoremap jk <C-\><C-n>

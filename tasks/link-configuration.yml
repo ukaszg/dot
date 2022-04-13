@@ -4,7 +4,6 @@
     home: "{{ ansible_facts['user_dir'] }}/"
     hidden_dir: "{{ home }}src/dot/hidden/"
     files_dir: "{{ home }}src/dot/files/"
-    mnt: "/mnt/c/Users/lukas"
   module_defaults:
     file:
       state: link
@@ -48,21 +47,24 @@
         state: link
       loop: "{{ files.files }}"
 
+    - name: Get windows USERPROFILE
+      shell: "{{ files_dir }}/bin/winenv.sh -p USERPROFILE"
+      register: userprofile
+
     - name: Link to windows USERPROFILE
       file:
-        src: "{{ mnt }}"
+        src: "{{ userprofile.stdout }}"
         dest: "{{ home }}/mnt"
         state: link
 
-    - name: Link to windows .m2
+    - name: Create .m2 dir in windows
       file:
-        src: "{{ mnt }}/.m2"
-        dest: "{{ home }}/.m2"
-        state: link
+        path: "{{ userprofile.stdout }}/.m2"
+        state: directory
 
-    - name: Copy .gitconfig to windows
+    - name: Copy a new version of .gitconfig to windows
       copy:
         src: "{{ hidden_dir }}/gitconfig"
-        dest: "{{ mnt }}/.gitconfig"
+        dest: "{{ userprofile.stdout }}/.gitconfig"
         force: yes
 

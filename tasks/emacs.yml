@@ -6,5 +6,7 @@
       git:
         repo: https://github.com/hlissner/doom-emacs
         dest: "{{ ansible_facts['user_dir'] }}/.emacs.d"
-        version: develop
+        clone: yes
+        update: yes
+        version: master
 

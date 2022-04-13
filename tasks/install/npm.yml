@@ -3,7 +3,7 @@
   become: false
   module_defaults:
     npm:
-      path: {{ ansible_facts['user_dir'] }}/.local/
+      path: "{{ ansible_facts['user_dir'] }}/.local/"
       production: yes
       state: latest
   tasks:

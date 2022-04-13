@@ -2,3 +2,4 @@
 ansible.log
 /files/org/*.pdf
 /files/org/*.tex
+ansible_collections

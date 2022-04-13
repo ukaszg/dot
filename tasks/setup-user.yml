@@ -34,13 +34,13 @@
 
     - name: Set fish as my default shell
       user:
-        name: "{{ whoami }}"
+        name: "{{ whoami.stdout }}"
         shell: /usr/bin/fish
       become: true
 
     - name: Add me to a docker group
       user:
-        name: "{{ whoami }}"
+        name: "{{ whoami.stdout }}"
         groups: docker
         append: yes
       become: true
