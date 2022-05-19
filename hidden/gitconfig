@@ -16,7 +16,7 @@
 	branch = true
 	decorate = true
 	interactive = true
-	pager = false
+	pager = true
 	showbranch = true
 	status = true
 	ui = true
