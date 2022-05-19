@@ -9,19 +9,20 @@
   module_defaults:
     file:
       state: link
-      force: yes
+      force: true
   tasks:
     - name: Gather a list of config files
       find:
         paths: "{{ hidden_dir }}"
-        recurse: yes
+        recurse: true
       register: hidden_files
 
     - name: Create missing hidden dirs
-      shell: "mkdir -p $(dirname {{ item['path']|replace(hidden_dir, home+'.') }})"
+      file:
+        path: "{{ item['path']|replace(hidden_dir, home+'.')|dirname }}"
+        state: directory
+        force: false
       loop: "{{ hidden_files.files }}"
-      args:
-        warn: false
 
     - name: Link config files to home
       file:
@@ -33,20 +34,20 @@
     - name: Gather a list of regular files
       find:
         paths: "{{ files_dir }}"
-        recurse: yes
+        recurse: true
       register: files
 
     - name: Create missing regular dirs
-      shell: "mkdir -p $(dirname {{ item['path']|replace(files_dir, home) }})"
+      file:
+        path: "{{ item['path']|replace(files_dir, home)|dirname }}"
+        state: directory
+        force: false
       loop: "{{ files.files }}"
-      args:
-        warn: false
 
     - name: Link regular files to home
       file:
         src: "{{ item['path'] }}"
         dest: "{{ item['path']|replace(files_dir, home) }}"
-        state: link
       loop: "{{ files.files }}"
 
     - name: Get windows USERPROFILE
@@ -62,18 +63,23 @@
       file:
         path: "{{ userprofile.stdout }}/.m2"
         state: directory
+        force: false
+
+    - name: Link to windows .m2 to wsl
+      file:
+        src: "{{ userprofile.stdout }}/.m2"
+        dest: "{{ home }}.m2"
 
     - name: Copy a new version of .gitconfig to windows
       copy:
         src: "{{ hidden_dir }}gitconfig"
         dest: "{{ userprofile.stdout }}/.gitconfig"
-        force: yes
+        force: true
 
     - name: Link /etc/wsl.conf
       file:
         src: "{{ src_dir }}wsl.conf"
         dest: "/etc/wsl.conf"
-        force: yes
         mode: '0644'
       become: true
 
