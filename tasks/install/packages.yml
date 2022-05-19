@@ -1,14 +1,16 @@
 ---
 - hosts: all
   become: true
+  vars:
+    ubuntu_version: focal
   tasks:
     - name: Add docker gpg-key to Ubuntu
       apt_key:
-        url: https://download.docker.com/linux/ubuntu/gpg
+        url: "https://download.docker.com/linux/ubuntu/gpg"
 
     - name: Add official docker-ce repository to Ubuntu
       apt_repository:
-        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ubuntu_version }} stable"
 
     - name: Add emacs repository
       apt_repository:
@@ -20,7 +22,7 @@
 
     - name: Add nodejs 14.x repository
       apt_repository:
-        repo: "deb https://deb.nodesource.com/node_14.x focal main"
+        repo: "deb https://deb.nodesource.com/node_14.x {{ ubuntu_version }} main"
 
     - name: Install my packages
       ignore_errors: yes
@@ -44,8 +46,8 @@
           - docker-ce-cli
           - docker-compose
           - dos2unix
-          - emacs27
-          - emacs27-el
+          - emacs28
+          - emacs28-el
           - fakeroot
           - fd-find
           - fish
