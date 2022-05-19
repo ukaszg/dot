@@ -1,0 +1,3 @@
+#!/usr/bin/env fish
+
+set -gx DISPLAY :0.0
