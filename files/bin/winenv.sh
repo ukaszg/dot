@@ -17,4 +17,4 @@ VALUE=$(powershell.exe "[System.Environment]::GetEnvironmentVariable(\"$1\")")
 
 [ "$TRANSLATE" = "1" ] && { VALUE=$(wslpath -a -u "$VALUE"); }
 
-exec echo "$VALUE"
+exec echo "$VALUE" | tr -d '\r'

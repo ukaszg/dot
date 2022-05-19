@@ -1,9 +1,11 @@
 ---
 - hosts: all
+  become: false
   vars:
     home: "{{ ansible_facts['user_dir'] }}/"
     hidden_dir: "{{ home }}src/dot/hidden/"
     files_dir: "{{ home }}src/dot/files/"
+    src_dir: "{{ home }}src/dot/src/"
   module_defaults:
     file:
       state: link
@@ -48,14 +50,13 @@
       loop: "{{ files.files }}"
 
     - name: Get windows USERPROFILE
-      shell: "{{ files_dir }}/bin/winenv.sh -p USERPROFILE"
+      shell: "{{ files_dir }}bin/winenv.sh -p USERPROFILE"
       register: userprofile
 
     - name: Link to windows USERPROFILE
       file:
         src: "{{ userprofile.stdout }}"
-        dest: "{{ home }}/mnt"
-        state: link
+        dest: "{{ home }}mnt"
 
     - name: Create .m2 dir in windows
       file:
@@ -64,7 +65,15 @@
 
     - name: Copy a new version of .gitconfig to windows
       copy:
-        src: "{{ hidden_dir }}/gitconfig"
+        src: "{{ hidden_dir }}gitconfig"
         dest: "{{ userprofile.stdout }}/.gitconfig"
         force: yes
+
+    - name: Link /etc/wsl.conf
+      file:
+        src: "{{ src_dir }}wsl.conf"
+        dest: "/etc/wsl.conf"
+        force: yes
+        mode: '0644'
+      become: true
 

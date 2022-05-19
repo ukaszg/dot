@@ -1,0 +1,19 @@
+---
+- hosts: all
+  become: false
+  vars:
+    packages:
+      - Microsoft.WindowsTerminal
+      - Mozilla.Firefox
+      - Microsoft.Skype
+      - Valve.Steam
+      - Python.Python.3
+      - Microsoft.OpenJDK.11
+      - GoLang.Go
+      - Git.Git
+      - flux.flux
+      - TheDocumentFoundation.LibreOffice
+  tasks:
+    - name: Install windows packages
+      shell: "winget.exe install {{ item }}"
+      loop: "{{ packages }}"
