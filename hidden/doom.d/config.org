@@ -3,11 +3,13 @@
 #+LANGUAGE: en
 #+TAGS: package(p) advice(a) disabled(d) hook(h) bind(b) setq(s) noexport(x) popup(u) hack(H)
 #+TODO: TODO
-#+OPTIONS: tags:t tasks:t todo:t inline:t num:nil toc:nil html-style:nil
+#+OPTIONS: tags:t tasks:t todo:t inline:t num:nil toc:nil
+#+OPTIONS: html5-fancy:t html-postamble:nil html-preamble:nil html-scripts:nil html-style:nil
 #+STARTUP: indent hidestars
-#+PROPERTY: header-args:emacs-lisp :tangle ~/.doom.d/config.el :tangle-mode (identity #o400) :results silent :exports code :lexical yes :mkdirp no
+#+HTML_DOCTYPE: html5
 #+HTML_HEAD: <link rel="preload" href="Zenburn.woff2" as="font" type="font/woff2" />
 #+HTML_HEAD_EXTRA: <link rel="stylesheet" type="text/css" href="config.css" />
+#+PROPERTY: header-args:emacs-lisp :tangle ~/.doom.d/config.el :tangle-mode (identity #o400) :results silent :exports code :lexical yes :mkdirp no
 #+EXPORT_FILE_NAME: index.html
 #+LINK_HOME: https://gruner.lu/kasz/
 
@@ -20,6 +22,7 @@
 *** and =packages.el=
 #+begin_src emacs-lisp :tangle ~/.doom.d/packages.el
 ;;; ~/.doom.d/packages.el -*- no-byte-compile: t; lexical-binding: t; -*-
+(package! simple-httpd)
 #+end_src
 *** load or create =custom.el=                                          :setq:
 #+begin_src emacs-lisp
@@ -37,19 +40,18 @@
 #+begin_src emacs-lisp :tangle ~/.doom.d/init.el
 ;;; ~/.doom.d/init.el -*- lexical-binding: t; -*-
 (doom! :completion (company -tng) (vertico +icons)
-       :ui         doom doom-dashboard doom-quit
-                   hl-todo modeline nav-flash ophints treemacs
-                   (popup +all +defaults) vc-gutter vi-tilde-fringe workspaces
+       :ui         doom doom-quit hl-todo (modeline +light) nav-flash ophints
+                   (treemacs +lsp)   (popup +all +defaults) vc-gutter vi-tilde-fringe
        :editor     (evil +everywhere) file-templates fold format snippets word-wrap
        :emacs      (dired +icons) electric (ibuffer +icons) undo vc
        :term       vterm
        :checkers   syntax
-       :tools      ansible debugger (docker +lsp) (eval +overlay)
-                   (lookup +docsets) (lsp +peek) magit make prodigy taskrunner upload
+       :tools      ansible (debugger +lsp) (docker +lsp) (eval +overlay)
+                   (lookup +docsets +offline) (lsp +peek) magit make
        :os         tty
        :lang       (cc +lsp) data emacs-lisp (go +lsp) (java +lsp)
                    (javascript +lsp) (json +lsp) lua markdown org (python +lsp)
-                   rest (rust +lsp) (sh +fish +lsp) (web +lsp) (yaml +lsp)
+                   rest (sh +fish +lsp) (web +lsp) (yaml +lsp)
        :config     literate (default +bindings))
 #+end_src
 ** *HACKS*
@@ -64,7 +66,8 @@ take note that doom-emacs doesn't yet support emacs version 28
 Some modes don't require macros (like most RO buffers).
 #+begin_src emacs-lisp
 (defun uki/local-remap-q-kills-buffer ()
-  (define-key evil-normal-state-local-map (kbd "q") #'kill-current-buffer))
+  (define-key evil-normal-state-local-map (kbd "q") #'quit-window)
+  (define-key evil-visual-state-local-map (kbd "q") #'quit-window))
 #+end_src
 * Minor-modes
 ** =Builtin= and one-liners
@@ -78,8 +81,8 @@ Some modes don't require macros (like most RO buffers).
 #+begin_src emacs-lisp
 (setq! doom-theme               'doom-zenburn
        doom-variable-pitch-font "DejaVu Sans:size=12"
-       doom-font                "Terminus:size=16"
-       doom-big-font            "Terminus:size=22")
+       doom-font                "Terminus:size=18"
+       doom-big-font            "Terminus:size=24")
 #+end_src
 *** Start maximized
 #+begin_src emacs-lisp
@@ -123,22 +126,7 @@ Some modes don't require macros (like most RO buffers).
     "Set local value for `whitespace-style'."
     (setq-local whitespace-style '(face trailing))))
 #+end_src
-** Persp
-*** Kill buffers removed from workspace and empty workspaces            :setq:
-#+begin_src emacs-lisp
-(after! persp-mode
-  (setq! persp-autokill-buffer-on-remove 'kill
-         persp-autokill-persp-when-removed-last-buffer 'kill))
-#+end_src
 ** Hl-Todo
-*** Setup colors/faces                                                  :setq:
-#+begin_src emacs-lisp
-(after! hl-todo
-  (setq! hl-todo-keyword-faces `(("TODO" font-lock-warning-face bold)
-                                 ("FIXME" error bold)
-                                 ("HACK" font-lock-keyword-face bold)
-                                 ("XXX" font-lock-doc-face bold))))
-#+end_src
 *** Highlight background                                                :setq:
 #+begin_src emacs-lisp
 (after! hl-todo
@@ -214,8 +202,10 @@ Some modes don't require macros (like most RO buffers).
 * Major-modes
 ** Messages-Buffer
 *** <q> exits buffer/window
+Messages buffer already exists so hook won't get called until it gets restarted. We need to modify bindings manually.
 #+begin_src emacs-lisp
 (add-hook! 'messages-buffer-mode-hook #'uki/local-remap-q-kills-buffer)
+(with-current-buffer "*Messages*" (uki/local-remap-q-kills-buffer))
 #+end_src
 ** Prog
 *** <C-x =>/<SPC c => Align your code in a pretty way                   :bind:
@@ -466,13 +456,6 @@ and disable the modeline.
 (after! lsp-java
   (setq! lsp-java-code-generation-use-blocks t))
 #+end_src
-*** LSP vm args
-#+begin_src emacs-lisp
-(after! lsp-java
-  (setq! lsp-java-vmargs
-         '("-XX:UseParallelGC" "-XX:GCTimeRatio=4" "-XX:AdaptiveSizePolicyWeight=90"
-           "-Dsun.zip.disableMemoryMapping=true" "-Xmx2G" "-Xms512m" "-XX:+UseStringDeduplication")))
-#+end_src
 ** Compilation
 *** Have <q> exit window                                           :hook:bind:
 #+begin_src emacs-lisp
@@ -488,7 +471,6 @@ and disable the modeline.
 #+begin_src emacs-lisp
 (add-hook! 'comint-mode-hook #'uki/local-remap-q-kills-buffer)
 #+end_src
-
 * Auto tangle & compile
 My =~/.doom.d/config.org= is a softlink, so depending on if I open a symlink or
 concrete file, ~+literate-enable-recompile-h~ might not recognize it as literate config.
