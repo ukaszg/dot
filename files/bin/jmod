@@ -1,2 +1,2 @@
 #!/bin/sh
-exec jmod.exe $@
+exec wsl-context-do.fish jmod.exe /usr/bin/jmod "$@"

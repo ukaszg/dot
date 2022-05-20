@@ -1,2 +1,2 @@
 #!/bin/sh
-exec keytool.exe $@
+exec wsl-context-do.fish keytool.exe /usr/bin/keytool "$@"

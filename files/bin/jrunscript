@@ -1,2 +1,2 @@
 #!/bin/sh
-exec jrunscript.exe $@
+exec wsl-context-do.fish jrunscript.exe /usr/bin/jrunscript "$@"

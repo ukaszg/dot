@@ -1,2 +1,2 @@
 #!/bin/sh
-exec jjs.exe $@
+exec wsl-context-do.fish jjs.exe /usr/bin/jjs "$@"

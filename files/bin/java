@@ -1,2 +1,3 @@
 #!/bin/sh
-exec java.exe $@
+
+exec wsl-context-do.fish java.exe /usr/bin/java "$@"

@@ -1,2 +1,2 @@
 #!/bin/sh
-exec jdeps.exe $@
+exec wsl-context-do.fish jdeps.exe /usr/bin/jdeps "$@"

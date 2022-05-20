@@ -1,2 +1,2 @@
 #!/bin/sh
-exec javadoc.exe $@
+exec wsl-context-do.fish javadoc.exe /usr/bin/javadoc "$@"

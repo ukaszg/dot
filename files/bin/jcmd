@@ -1,2 +1,2 @@
 #!/bin/sh
-exec jcmd.exe $@
+exec wsl-context-do.fish jcmd.exe /usr/bin/jcmd "$@"

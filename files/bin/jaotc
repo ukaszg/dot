@@ -1,2 +1,2 @@
 #!/bin/sh
-exec jaotc.exe $@
+exec wsl-context-do.fish jaotc.exe /usr/bin/jaotc "$@"

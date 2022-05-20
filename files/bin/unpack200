@@ -1,2 +1,2 @@
 #!/bin/sh
-exec unpack200.exe $@
+exec wsl-context-do.fish unpack200.exe /usr/bin/unpack200 "$@"

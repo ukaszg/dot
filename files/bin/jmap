@@ -1,2 +1,2 @@
 #!/bin/sh
-exec jmap.exe $@
+exec wsl-context-do.fish jmap.exe /usr/bin/jmap "$@"

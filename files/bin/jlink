@@ -1,2 +1,2 @@
 #!/bin/sh
-exec jlink.exe $@
+exec wsl-context-do.fish jlink.exe /usr/bin/jlink "$@"

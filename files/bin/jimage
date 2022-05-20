@@ -1,2 +1,2 @@
 #!/bin/sh
-exec jimage.exe $@
+exec wsl-context-do.fish jimage.exe /usr/bin/jimage "$@"

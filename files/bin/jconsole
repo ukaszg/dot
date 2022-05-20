@@ -1,2 +1,2 @@
 #!/bin/sh
-exec jconsole.exe $@
+exec wsl-context-do.fish jconsole.exe /usr/bin/jconsole "$@"

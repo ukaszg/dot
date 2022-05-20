@@ -1,2 +1,2 @@
 #!/bin/sh
-exec javap.exe $@
+exec wsl-context-do.fish javap.exe /usr/bin/javap "$@"

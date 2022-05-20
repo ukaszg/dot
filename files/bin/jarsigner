@@ -1,2 +1,2 @@
 #!/bin/sh
-exec jarsigner.exe $@
+exec wsl-context-do.fish jarsigner.exe /usr/bin/jarsigner "$@"

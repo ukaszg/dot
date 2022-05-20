@@ -1,2 +1,2 @@
 #!/bin/sh
-exec jinfo.exe $@
+exec wsl-context-do.fish jinfo.exe /usr/bin/jinfo "$@"

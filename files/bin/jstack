@@ -1,2 +1,2 @@
 #!/bin/sh
-exec jstack.exe $@
+exec wsl-context-do.fish jstack.exe /usr/bin/jstack "$@"

@@ -1,2 +1,2 @@
 #!/bin/sh
-exec rmiregistry.exe $@
+exec wsl-context-do.fish rmiregistry.exe /usr/bin/rmiregistry "$@"

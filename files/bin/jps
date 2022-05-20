@@ -1,2 +1,2 @@
 #!/bin/sh
-exec jps.exe $@
+exec wsl-context-do.fish jps.exe /usr/bin/jps "$@"

@@ -1,2 +1,2 @@
 #!/bin/sh
-exec jar.exe $@
+exec wsl-context-do.fish jar.exe /usr/bin/jar "$@"

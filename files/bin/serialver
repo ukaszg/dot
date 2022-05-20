@@ -1,2 +1,2 @@
 #!/bin/sh
-exec serialver.exe $@
+exec wsl-context-do.fish servialver.exe /usr/bin/servialver "$@"

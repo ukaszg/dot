@@ -1,2 +1,2 @@
 #!/bin/sh
-exec jhsdb.exe $@
+exec wsl-context-do.fish jhsdb.exe /usr/bin/jhsdb "$@"

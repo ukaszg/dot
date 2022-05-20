@@ -1,2 +1,2 @@
 #!/bin/sh
-exec jstat.exe $@
+exec wsl-context-do.fish jstat.exe /usr/bin/jstat "$@"

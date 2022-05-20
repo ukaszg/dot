@@ -1,2 +1,2 @@
 #!/bin/sh
-exec jfr.exe $@
+exec wsl-context-do.fish jfr.exe /usr/bin/jfr "$@"

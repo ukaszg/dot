@@ -1,2 +1,2 @@
 #!/bin/sh
-exec rmid.exe $@
+exec wsl-context-do.fish rmid.exe /usr/bin/rmid "$@"
