@@ -4,10 +4,7 @@
   vars:
     home_dirs:
       - bin
-      - m
-      - pic/wp
       - pub
-      - vid
       - src
       - incoming
       - .cache
@@ -21,21 +18,38 @@
         state: directory
       loop: "{{ home_dirs }}"
 
-    - name: Fetch my GPG keys
+    - name: Get windows USERPROFILE
+      shell: "{{ ansible_facts['user_dir'] }}/src/dot/files/bin/winenv.sh -p USERPROFILE"
+      register: userprofile
+
+    - name: Fetch my GPG keys for windows
       git:
-          repo: git@github.com:ukaszg/_gnupg.git
-          dest: "{{ ansible_facts['user_dir'] }}/.gnupg"
-          clone: yes
-          update: yes
+        repo: git@github.com:ukaszg/_gnupg.git
+        dest: "{{ userprofile.stdout }}/.gnupg"
+        executable: /usr/bin/git
+        clone: yes
+        update: yes
+        version: master
+
+    - name: Link windows GPG keys to WSL
+      file:
+        src: "{{ userprofile.stdout }}/.gnupg"
+        dest: "{{ ansible_facts['user_dir'] }}/.gnupg"
+        state: link
+        force: true
 
     - name: who am I?
       shell: "whoami"
       register: whoami
 
+    - name: Get path to fish executable
+      shell: "command -v fish"
+      register: fish_path
+
     - name: Set fish as my default shell
       user:
         name: "{{ whoami.stdout }}"
-        shell: /usr/bin/fish
+        shell: "{{ fish_path.stdout }}"
       become: true
 
     - name: Add me to a docker group
