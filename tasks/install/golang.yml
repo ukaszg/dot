@@ -3,7 +3,7 @@
   become: false
   vars:
     packages:
-      - github.com/nsf/gocode@latest
+      - github.com/stamblerre/gocode@latest
       - golang.org/x/tools/gopls@latest
       - github.com/cweill/gotests/...
       - golang.org/x/tools/cmd/guru@latest
