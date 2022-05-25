@@ -1,19 +1,20 @@
 ---
 - hosts: all
+  become: false
   vars:
     packages:
-      - golang.org/x/tools/cmd/guru
-#      - github.com/motemen/gore/...
+      - github.com/nsf/gocode@latest
+      - golang.org/x/tools/gopls@latest
       - github.com/cweill/gotests/...
-      - github.com/nsf/gocode
-      - github.com/fatih/gomodifytags
-      - golang.org/x/tools/gopls
+      - golang.org/x/tools/cmd/guru@latest
+      - github.com/fatih/gomodifytags@latest
+      - github.com/x-motemen/gore/cmd/gore@latest
   tasks:
     - name: Build src/serve.go
       command: go build -ldflags='-s -w' -o ~/bin/serve ~/src/dot/src/serve.go
       changed_when: false
 
     - name: Instal Go tooling
-      shell: go get -v -ldflags='-s -w' "{{ item }}"
+      shell: go get -u -ldflags='-s -w' {{ item }}
       loop: "{{ packages }}"
       changed_when: false

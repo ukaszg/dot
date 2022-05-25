@@ -55,7 +55,7 @@
           - fonts-terminus
           - glslang-tools
           - git
-          - golang
+          - golang-1.16
           - grep
           - htop
           - jq
