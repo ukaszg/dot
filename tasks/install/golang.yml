@@ -14,7 +14,12 @@
       command: go build -ldflags='-s -w' -o ~/bin/serve ~/src/dot/src/serve.go
       changed_when: false
 
-    - name: Instal Go tooling
+    - name: Instal Go tooling for wsl
       shell: go get -u -ldflags='-s -w' {{ item }}
+      loop: "{{ packages }}"
+      changed_when: false
+
+    - name: Instal Go tooling for windows
+      shell: go.exe install {{ item }}
       loop: "{{ packages }}"
       changed_when: false
