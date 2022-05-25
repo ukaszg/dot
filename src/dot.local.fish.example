@@ -1,3 +1,7 @@
 #!/usr/bin/env fish
 
+# win11
 set -gx DISPLAY :0.0
+
+# win10
+#set -gx DISPLAY (ip route | awk '/default via /' | cut -d' ' -f3):0.0
