@@ -15,7 +15,6 @@ set -gx XDG_MUSIC_DIR "$HOME/m/"
 set -gx XDG_PICTURES_DIR "$HOME/pic/"
 set -gx XDG_VIDEOS_DIR "$HOME/vid/"
 set -gx INFOPATH "$HOME/.local/share/info/:$INFOPATH"
-set -gx DISPLAY (ip route|awk '/^default/{print $3}'):0.0
 
 # don't create `__pycache__` directories
 set -x PYTHONDONTWRITEBYTECODE 'True'

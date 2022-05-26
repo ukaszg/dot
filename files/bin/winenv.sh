@@ -1,7 +1,7 @@
 #!/bin/sh
 
 TRANSLATE=0
-[ $1 = '-p' ] && {
+[ "$1" = '-p' ] && {
     TRANSLATE=1
     shift 1
 }

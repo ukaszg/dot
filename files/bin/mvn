@@ -1,9 +1,3 @@
-#!/usr/bin/env fish
-set -l real_path (readlink -f $PWD)
+#!/bin/sh
 
-if test (string sub -l 5 $real_path) = "/mnt/"
-    exec cmd.exe (command -v mvn.cmd) $argv
-else
-    exec /usr/bin/mvn $argv
-end
-
+exec wsl-context-do.fish mvn.cmd /usr/bin/mvn --cmd "$@"

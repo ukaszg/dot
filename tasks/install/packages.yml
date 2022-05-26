@@ -86,11 +86,43 @@
 
     - name: Install vim-plug for vim
       shell: |
-          DIR="${HOME}/.vim/autoload/"
+          DIR="~/.vim/autoload/"
           mkdir -p "${DIR}"
           curl -fLo "${DIR}/plug.vim" https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
           dos2unix "${DIR}/plug.vim"
       args:
         creates: ~/.vim/autoload/plug.vim
         warn: false
+      become: false
+
+    - name: Install fisher for fish
+      shell: curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
+      args:
+        creates: ~/.config/fish/functions/fisher.fish
+        warn: false
+        executable: /usr/bin/fish
+      become: false
+
+    - name: Install colored man pages for fish
+      shell: fisher install decors/fish-colored-man
+      args:
+        creates: ~/.config/fish/functions/man.fish
+        warn: false
+        executable: /usr/bin/fish
+      become: false
+
+    - name: Install docker completions for fish
+      shell: fisher install lewisacidic/fish-docker
+      args:
+        creates: ~/.config/fish/completions/docker.fish
+        warn: false
+        executable: /usr/bin/fish
+      become: false
+
+    - name: Install sudo completions for fish
+      shell: fisher install eth-p/fish-plugin-sudo
+      args:
+        creates: ~/.config/fish/completions/sudo.fish
+        warn: false
+        executable: /usr/bin/fish
       become: false

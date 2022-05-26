@@ -9,5 +9,6 @@ function fish_user_key_bindings
         bind -M $m \cb backward-char
         bind -M $m \e\x7f backward-kill-word
         bind -M $m \e\b backward-kill-word
+        bind -M $m \cs '__ethp_commandline_toggle_sudo.fish'
     end
 end

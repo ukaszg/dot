@@ -1,6 +1,6 @@
 function fish_prompt
 	set -l home_escaped (echo -n $HOME | sed 's/\//\\\\\//g')
-    set -l pwd (echo -n $PWD | sed "s/^$home_escaped/~/" | sed 's/ /%20/g')
+    set -l pwd (readlink -f $PWD | sed -e "s/^$home_escaped/~/" -e 's/ /%20/g')
     set -l prompt_symbol ''
     set -l cwd_color ''
 
