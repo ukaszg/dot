@@ -51,7 +51,7 @@
                    (eval +overlay) lookup (lsp +peek) magit make
        :os         tty
        :lang       (cc +lsp) data emacs-lisp (go +lsp)
-                   (java +lsp) (javascript +lsp) (json +lsp)
+                   (java +lsp) (javascript +lsp) (json -lsp)
                    lua markdown org (python +lsp) rest
                    (sh +fish -lsp) (web +lsp) (yaml -lsp)
        :config     literate (default +bindings +smartparens))
@@ -79,6 +79,12 @@ Some modes don't require macros (like most RO buffers).
     ;; powershell adds an extra newline
     (setq text (substring text 0 -1))
     (insert text)))
+#+end_src
+*** Set `$EMACS` variable for wsl wrapper scripts
+My script [[~/bin/wsl-context-do.fish]] expects EMACS env var to be present.
+This allows to run only wsl versions of wrapped commands.
+#+begin_src emacs-lisp
+(setenv "EMACS" "yes")
 #+end_src
 * Minor-modes
 ** =Builtin= and one-liners
@@ -259,7 +265,7 @@ Why so complicated? [[https://nullprogram.com/blog/2019/12/10/#cl-first]]
 ** Org
 *** Startup options                                                     :setq:
 #+begin_src emacs-lisp
-(setq! org-tags-column -80
+(setq! org-tags-column 80
        org-startup-indented t
        org-startup-folded t
        org-startup-truncated t
@@ -277,6 +283,30 @@ Why so complicated? [[https://nullprogram.com/blog/2019/12/10/#cl-first]]
 *** Follow link under point with <RET>                                  :setq:
 #+begin_src emacs-lisp
 (setq! org-return-follows-link t)
+#+end_src
+*** Export clickable headlines with an anchor                           :setq:
+#+begin_src emacs-lisp
+(after! org
+  (setq! org-html-self-link-headlines t))
+#+end_src
+*** Htmlize will use classes                                            :setq:
+instead of inline styles. Requires proper *.css* file.
+#+begin_src emacs-lisp
+(after! org
+  (setq! org-html-htmlize-output-type 'css))
+#+end_src
+*** Export html5 documents                                              :setq:
+#+begin_src emacs-lisp
+(after! org
+  (setq! org-html-doctype "html5"
+         org-html-html5-fancy t
+         org-html-container-element "section"
+         org-html-divs '((preamble  "nav" "preamble")
+                         (content   "article" "content")
+                         (postamble "footer" "postamble"))
+         org-html-checkbox-type 'unicode
+         org-html-metadata-timestamp-format "%d-%m-%Y"
+         org-html-head-include-default-style nil))
 #+end_src
 *** Publishing                                                          :setq:
 #+begin_src emacs-lisp
@@ -310,7 +340,7 @@ Why so complicated? [[https://nullprogram.com/blog/2019/12/10/#cl-first]]
   :modeline nil)
 #+end_src
 *** Have =org-src= buffers be managed by orgmode                  :setq:popup:
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp
 (setq! org-src-window-setup 'current-window)
 
 (set-popup-rule! "^\\*Org Src"
@@ -328,9 +358,10 @@ Why so complicated? [[https://nullprogram.com/blog/2019/12/10/#cl-first]]
       (add-hook 'eldoc-documentation-functions #'elisp-eldoc-var-docstring nil t)
       (eldoc-mode 1))))
 #+end_src
-*** Block templates
+*** Block templates                                                     :setq:
 #+begin_src emacs-lisp
 (after! org
+  (require 'org-tempo)
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")))
 #+end_src
 ** Info
