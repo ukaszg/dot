@@ -3,6 +3,7 @@
   become: true
   vars:
     ubuntu_version: focal
+    ripgrep_url: https://github.com/BurntSushi/ripgrep/releases/download/13.0.0/ripgrep_13.0.0_amd64.deb
   tasks:
     - name: Add docker gpg-key to Ubuntu
       apt_key:
@@ -41,7 +42,6 @@
           - cmake
           - curl
           - debhelper
-          - dh-make-golang
           - docker-ce
           - docker-ce-cli
           - docker-compose
@@ -65,10 +65,8 @@
           - mc
           - nodejs
           - pandoc
-          - pinentry-gtk2
           - python-is-python3
           - python3-pip
-          - ripgrep
           - rust-all
           - shellcheck
           - sqlite3
@@ -125,4 +123,13 @@
         creates: ~/.config/fish/completions/sudo.fish
         warn: false
         executable: /usr/bin/fish
+      become: false
+
+    - name: Install ripgrep from github
+      shell: |
+        curl -fLo /tmp/ripgrep.deb {{ ripgrep_url }} && \
+        dpkg -i /tmp/ripgrep.deb  && \
+        rm -f /tmp/ripgrep.deb
+      args:
+        creates: /usr/bin/rg
       become: false
