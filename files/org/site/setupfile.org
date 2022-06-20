@@ -1,0 +1,18 @@
+#+BIND: org-html-container-element "section"
+#+BIND: org-html-checkbox-type 'unicode
+#+BIND: org-html-metadata-timestamp-format "%Y-%m-%d"
+#+BIND: org-html-postamble "<p>%a    2022    %c</p>"
+#+BIND: org-html-preamble "Preamble"
+#+BIND: org-html-htmlize-output-type 'css
+#+BIND: org-html-head-include-default-style nil
+#+BIND: org-html-head-include-scripts nil
+#+OPTIONS: html-scripts:nil html-style:nil
+#+OPTIONS: tags:t tasks:nil todo:nil inline:t num:nil toc:nil
+#+LANGUAGE: en
+#+HTML_DOCTYPE: html5
+#+HTML_HTML5_FANCY: t
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="/kasz/style.css" />
+#+EXPORT_FILE_NAME: index.html
+#+LINK_HOME: https://gruner.lu/kasz/
+#+EMAIL: lukasz@gruner.lu
+#+AUTHOR: Łukasz Gruner
