@@ -1,14 +1,14 @@
 #+TITLE: doom-literate-config
 #+DESCRIPTION: Doom Emacs literate config.
 #+LANGUAGE: en
-#+TAGS: package(p) advice(a) disabled(d) hook(h) bind(b) setq(s) noexport(x) popup(u) hack(H)
+#+TAGS: package(p) advice(a) disabled(d) hook(h) bind(b) setq(s) popup(u) hack(H)
 #+TODO: TODO
-#+OPTIONS: tags:t tasks:t todo:t inline:t num:nil toc:nil
-#+OPTIONS: html5-fancy:t html-postamble:nil html-preamble:nil html-scripts:nil html-style:nil
-#+STARTUP: indent hidestars
+#+OPTIONS: html-postamble:nil html-preamble:nil html-scripts:nil html-style:nil
+#+OPTIONS: tags:nil tasks:t todo:t inline:t num:nil toc:nil
+#+STARTUP: indent hidestars show2levels
 #+HTML_DOCTYPE: html5
-#+HTML_HEAD: <link rel="preload" href="Zenburn.woff2" as="font" type="font/woff2" />
-#+HTML_HEAD_EXTRA: <link rel="stylesheet" type="text/css" href="config.css" />
+#+HTML_HTML5_FANCY: t
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="/kasz/style.css" />
 #+PROPERTY: header-args:emacs-lisp :tangle ~/.doom.d/config.el :tangle-mode (identity #o400) :results silent :exports code :lexical yes :mkdirp no
 #+EXPORT_FILE_NAME: index.html
 #+LINK_HOME: https://gruner.lu/kasz/
@@ -135,13 +135,6 @@ This allows to run only wsl versions of wrapped commands.
 (after! (:and simple adaptive-wrap)
   (+global-word-wrap-mode +1))
 #+end_src
-*** Only highlight trailing whitespace when coding                 :hook:setq:
-#+begin_src emacs-lisp
-(add-hook! '(prog-mode-hook org-mode-hook)
-  (defun uki/set-whitespace-style-to-trailing-space-h ()
-    "Set local value for `whitespace-style'."
-    (setq-local whitespace-style '(face trailing))))
-#+end_src
 ** Consult
 *** Buffer list filtering
 #+begin_src emacs-lisp
@@ -184,6 +177,20 @@ This allows to run only wsl versions of wrapped commands.
   (defun uki/flycheck-disable-textlint-h ()
     (cl-pushnew 'textlint flycheck-disabled-checkers)))
 #+end_src
+** LSP
+#+begin_src emacs-lisp
+(after! lsp
+  (require 'lsp-ui)
+  (setq! lsp-enable-symbol-highlighting nil
+         lsp-ui-doc-enable t
+         lsp-ui-doc-show-with-mouse t
+         lsp-ui-doc-show-with-cursor nil
+         lsp-lens-enable t
+         lsp-headerline-breadcrumb-enable nil
+         lsp-ui-sideline-enable nil
+         lsp-ui-sideline-show-code-actions nil
+         lsp-ui-sideline-show-hover t))
+#+end_src
 * Major-modes
 ** Messages
 *** <q> exits buffer/window
@@ -204,6 +211,13 @@ Messages buffer already exists so hook won't get called until it gets restarted.
 #+begin_src emacs-lisp
 (setq-hook! 'prog-mode-hook
   show-trailing-whitespace t)
+#+end_src
+*** Only highlight trailing whitespace when coding                 :hook:setq:
+#+begin_src emacs-lisp
+(add-hook! '(prog-mode-hook org-mode-hook)
+  (defun uki/set-whitespace-style-to-trailing-space-h ()
+    "Set local value for `whitespace-style'."
+    (setq-local whitespace-style '(face trailing))))
 #+end_src
 ** Dired
 *** Reuse current dired buffer when changing directories                :bind:
@@ -273,7 +287,7 @@ Why so complicated? [[https://nullprogram.com/blog/2019/12/10/#cl-first]]
 #+end_src
 *** My ~org-directory~                                                  :setq:
 #+begin_src emacs-lisp
-(setq! org-directory "~/org/")
+(setq! org-directory (file-truename "~/org/"))
 #+end_src
 *** Bind ~org-babel-tangle~ under :localleader                          :bind:
 #+begin_src emacs-lisp
@@ -301,42 +315,64 @@ instead of inline styles. Requires proper *.css* file.
   (setq! org-html-doctype "html5"
          org-html-html5-fancy t
          org-html-container-element "section"
-         org-html-divs '((preamble  "nav" "preamble")
+         org-html-divs '((preamble  "header" "preamble")
                          (content   "article" "content")
                          (postamble "footer" "postamble"))
          org-html-checkbox-type 'unicode
-         org-html-metadata-timestamp-format "%d-%m-%Y"
-         org-html-head-include-default-style nil))
+         org-html-metadata-timestamp-format "%Y-%m-%d"
+         org-html-head-include-default-style nil
+         org-html-head-include-scripts nil
+         org-export-allow-bind-keywords t))
 #+end_src
 *** Publishing                                                          :setq:
 #+begin_src emacs-lisp
 (after! ox-publish
-  (let* ((root-dir "/davs:ukaszg@fastmail.fm@myfiles.fastmail.com:/www/")
-         (conf-dir (concat root-dir "config/"))
-         (doompath (expand-file-name "hidden/doom.d/" uki/dotfiles-dir)))
+  (let* ((pub-dir "/tmp/results")
+         (duum-dir (expand-file-name "hidden/doom.d/" uki/dotfiles-dir))
+         (site-dir (expand-file-name "files/org/site/" uki/dotfiles-dir)))
     (setq! org-publish-project-alist
-           `(("gruner.lu/kasz/config" :components ("config-static-resources" "config/index.html"))
-             ("config-static-resources"
-              :base-directory ,doompath
-              :publishing-directory ,conf-dir
+           `(
+             ("css"
+              :base-directory ,(make-temp-file "css" t)
+              :publishing-directory ,pub-dir
               :publishing-function org-publish-attachment
-              :include ("favicon.ico" "config.css" "Droid_Sans_Mono.woff2")
+              :file ,(expand-file-name "main.org" site-dir)
+              :preparation-function site-preparation-function-css
+              :exclude-tags ("disabled" "noexport")
+              :include ("style.css")
               :exclude ".*")
-             ("config/index.html"
-              :base-directory ,doompath
-              :include ("config.org")
-              :exclude ".*"
-              :publishing-directory ,conf-dir
-              :html-postamble nil
+             ("static"
+              :base-directory ,site-dir
+              :publishing-directory ,pub-dir
+              :publishing-function org-publish-attachment
+              :include ("favicon.ico" "terminus.woff2")
+              :exclude ".*")
+             ("site"
+              :base-directory ,(make-temp-file "html" t)
+              :publishing-directory ,pub-dir
               :publishing-function org-html-publish-to-html
-              :keywords "config.org, doom-literate-config, init.el"
-              :html-doctype "html5"
-              :html-html5-fancy t)))))
+              :recursive t
+              :preparation-function site-preparation-function-html
+              :exclude-tags ("disabled" "noexport")
+              :file ,(expand-file-name "main.org" site-dir))
+             ("config/index.html"
+              :base-directory ,duum-dir
+              :publishing-directory ,pub-dir
+              :publishing-function org-html-publish-to-html
+              :file ,(expand-file-name "config.org" duum-dir)
+              :exclude-tags ("disabled" "noexport")
+              :html-postamble nil))) ))
 #+end_src
-*** Have export dialog open in place and without modeline              :popup:
+*** Have export dialog open in place and without modeline               :popup:
 #+begin_src emacs-lisp
 (set-popup-rule! "^ ?\\*Org Export Dispatcher"
   :actions '(display-buffer-same-window)
+  :side nil
+  :width nil
+  :height nil
+  :size nil
+  :quit nil
+  :select t
   :modeline nil)
 #+end_src
 *** Have =org-src= buffers be managed by orgmode                  :setq:popup:
@@ -345,7 +381,13 @@ instead of inline styles. Requires proper *.css* file.
 
 (set-popup-rule! "^\\*Org Src"
   :actions '(display-buffer-same-window)
-  :modeline nil)
+  :side nil
+  :width nil
+  :height nil
+  :size nil
+  :quit nil
+  :select t
+  :modeline t)
 #+end_src
 *** Enable eldoc-mode for src blocks                                    :hook:
 #+begin_src emacs-lisp
@@ -358,11 +400,29 @@ instead of inline styles. Requires proper *.css* file.
       (add-hook 'eldoc-documentation-functions #'elisp-eldoc-var-docstring nil t)
       (eldoc-mode 1))))
 #+end_src
-*** Block templates                                                     :setq:
+*** Add Elisp src block template                                       :setq:
 #+begin_src emacs-lisp
 (after! org
   (require 'org-tempo)
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")))
+#+end_src
+*** Add timestamps to new headings                                     :hook:
+#+begin_src emacs-lisp
+(defun uki/org-set-created-time (&optional active name)
+  "Set a property on the entry giving the creation time.
+
+By default the property is called CREATED. If given, the `NAME'
+argument will be used instead. If the property already exists, it
+will not be modified."
+  (interactive)
+  (let* ((created (or name "CREATED"))
+         (fmt (if active "<%s>" "[%s]"))
+         (now  (format fmt (format-time-string "%Y-%m-%d %a %H:%M"))))
+    (unless (org-entry-get (point) created nil)
+      (org-set-property created now))))
+
+(after! org
+  (add-hook 'org-insert-heading-hook #'uki/org-set-created-time))
 #+end_src
 ** Info
 *** Automatically view '.info' files instead of editing them            :setq:
