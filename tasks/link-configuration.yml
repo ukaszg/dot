@@ -76,6 +76,17 @@
         dest: "{{ userprofile.stdout }}/.gitconfig"
         force: true
 
+    - name: Ensure .gitconfig.local is present
+      file:
+        dest: "{{ home }}.gitconfig.local"
+        state: touch
+
+    - name: Copy a new version of .gitconfig.local to windows if exists
+      copy:
+        src: "{{ home }}.gitconfig.local"
+        dest: "{{ userprofile.stdout }}/.gitconfig"
+        force: true
+
     - name: Link /etc/wsl.conf
       file:
         src: "{{ src_dir }}wsl.conf"
