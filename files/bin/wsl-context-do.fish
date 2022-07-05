@@ -27,9 +27,9 @@ end
 if set -q _flag_cmd
     if [ (string sub -l 1 $win_cmd) != '/' ]
         # always use executable with absolute path.
-        set -l win_cmd (command -v $win_cmd)
+        set win_cmd (command -v $win_cmd)
     end
-    set -l win_cmd cmd.exe $win_cmd
+    set win_cmd cmd.exe $win_cmd
 end
 
 # Force Windows.

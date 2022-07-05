@@ -3,12 +3,12 @@
   become: false
   vars:
     packages:
-      - github.com/stamblerre/gocode@latest
-      - golang.org/x/tools/gopls@latest
+      - github.com/stamblerre/gocode
+      - golang.org/x/tools/gopls
       - github.com/cweill/gotests/...
-      - golang.org/x/tools/cmd/guru@latest
-      - github.com/fatih/gomodifytags@latest
-      - github.com/x-motemen/gore/cmd/gore@latest
+      - golang.org/x/tools/cmd/guru
+      - github.com/fatih/gomodifytags
+      - github.com/x-motemen/gore/cmd/gore
   tasks:
     - name: Build src/serve.go
       command: go build -ldflags='-s -w' -o ~/bin/serve ~/src/dot/src/serve.go
