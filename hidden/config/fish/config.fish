@@ -1,6 +1,7 @@
 set -Ux fish_user_paths $HOME/bin $HOME/.emacs.d/bin $HOME/.local/node_modules/.bin $HOME/.local/go/bin $HOME/.local/bin /opt/bin /sbin /usr/sbin
 set -Ux fish_greeting ''
 
+set -gx LANG pl_PL.UTF-8
 set -gx EDITOR vim
 set -gx VISUAL vim
 set -gx GOPATH "$HOME/.local/go"
