@@ -709,4 +709,7 @@ content
 content2
 * BLOG
 ** first post
+:PROPERTIES:
+:CREATED:  [2022-06-27 pon 02:56]
+:END:
 bork, bork, bork~
