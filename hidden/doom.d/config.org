@@ -98,7 +98,7 @@ This allows to run only wsl versions of wrapped commands.
 #+begin_src emacs-lisp
 (setq! doom-theme               'doom-zenburn
        doom-variable-pitch-font "DejaVu Sans:size=12"
-       doom-font                "Terminus:size=18"
+       doom-font                "Terminus:size=16"
        doom-big-font            "Terminus:size=24")
 #+end_src
 *** Start maximized
@@ -125,8 +125,7 @@ This allows to run only wsl versions of wrapped commands.
 #+end_src
 *** Enable ~+global-word-wrap-mode~
 #+begin_src emacs-lisp
-(after! (:and simple adaptive-wrap)
-  (+global-word-wrap-mode +1))
+(+global-word-wrap-mode +1)
 #+end_src
 *** Whitespace
 :PROPERTIES:
