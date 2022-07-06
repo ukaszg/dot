@@ -1,3 +1,3 @@
 #!/bin/sh
-#exec emacs -nw "$@"
+#exec emacsclient -nw "$@"
 exec /usr/bin/vim "$@"
