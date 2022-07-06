@@ -21,7 +21,7 @@
     status = true
     ui = true
 [core]
-    eol = crlf
+    eol = lf
 [rerere]
     enabled = true
 [transfer]

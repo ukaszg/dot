@@ -84,7 +84,7 @@
     - name: Copy a new version of .gitconfig.local to windows if exists
       copy:
         src: "{{ home }}.gitconfig.local"
-        dest: "{{ userprofile.stdout }}/.gitconfig"
+        dest: "{{ userprofile.stdout }}/.gitconfig.local"
         force: true
 
     - name: Link /etc/wsl.conf
