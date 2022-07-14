@@ -177,6 +177,7 @@ This allows to run only wsl versions of wrapped commands.
 (after! flycheck
   (add-hook! '(org-mode-hook text-mode-hook prog-mode-hook)
     (defun uki/flycheck-disable-textlint-h ()
+      (require 'flycheck)
       (cl-pushnew 'textlint flycheck-disabled-checkers))))
 #+end_src
 ** LSP
@@ -380,6 +381,7 @@ will not be modified."
 #+begin_src emacs-lisp
 (add-hook! 'emacs-lisp-mode-hook
   (defun uki/flycheck-disable-checkdoc-h ()
+    (require 'flycheck)
     (cl-pushnew 'emacs-lisp-checkdoc flycheck-disabled-checkers)))
 #+end_src
 ** Java
