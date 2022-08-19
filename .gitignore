@@ -4,3 +4,4 @@ ansible.log
 /files/org/*.tex
 ansible_collections
 .packages
+files/org/site/_out/*

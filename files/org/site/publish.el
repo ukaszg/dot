@@ -42,10 +42,25 @@
   :ensure t)
 
 (use-package org
-  :ensure t)
+  :ensure t
+  :config
+  (setq org-html-doctype "html5"
+        org-html-html5-fancy t
+        org-html-container-element "section"
+        org-html-divs '((preamble  "header" "preamble")
+                        (content   "article" "content")
+                        (postamble "footer" "postamble"))
+        org-html-checkbox-type 'unicode
+        org-html-metadata-timestamp-format "%Y-%m-%d"
+        org-html-head-include-default-style nil
+        org-html-head-include-scripts nil
+        org-export-allow-bind-keywords t
+        org-html-self-link-headlines t
+        org-html-htmlize-output-type 'css))
 
 (use-package webfeeder
   :ensure t)
+
 
 (add-to-list 'load-path default-directory)
 (require 'site)
@@ -53,6 +68,7 @@
 (defun site-publish ()
   "Publish the whole site."
   (interactive)
-  (org-publish-all t)
+  (let (make-backup-files)
+    (org-publish-all t))
   (message "Finished!"))
 ;;; publish.el ends here

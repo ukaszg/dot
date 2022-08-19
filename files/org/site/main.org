@@ -13,6 +13,29 @@
   src: local('Terminus'), url('/kasz/terminus.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+#+end_src
+** Settings
+:PROPERTIES:
+:CREATED:  [2022-08-08 21:17]
+:END:
+#+begin_src css
+:root{
+--sans: 1em/1.6 system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Droid Sans, Helvetica Neue, Fira Sans, sans-serif;
+--mono: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, Courier, 'Courier New', monospace;
+--c1:#0074d9;
+--c2:#eee;
+--c3:#fff;
+--c4:#000;
+--c5:#fff;
+--m1: 8px;
+--rc: 8px;
+}
+#+end_src
+** Org classes
+:PROPERTIES:
+:CREATED:  [2022-08-08 21:12]
+:END:
+#+begin_src css
 .org-right {
   margin-left: auto;
   margin-right: 0px;
@@ -36,38 +59,11 @@
   font-size: 80%;
   white-space: nowrap;
 }
-#+end_src
-** Code Colors
-#+begin_src css
 .linenr {
   font-size: smaller;
 }
 .code-highlighted {
   background-color: #ffff00;
-}
-pre {
-  border: 1px solid #ccc;
-  box-shadow: 3px 3px 3px #eee;
-  padding: 8pt;
-  overflow: auto;
-  margin: 1.2em;
-}
-pre.src {
-  position: relative;
-  overflow: visible;
-  padding-top: 1.2em;
-}
-pre.src:before {
-  display: none;
-  position: absolute;
-  background-color: #ccc;
-  top: -10px;
-  right: 10px;
-  padding: 3px;
-  border: 1px solid #3f3f3f;
-}
-pre.src:hover:before {
-  display: inline;
 }
 caption.t-above {
   caption-side: top;
@@ -75,46 +71,10 @@ caption.t-above {
 caption.t-bottom {
   caption-side: bottom;
 }
-.todo,
-.tag,
-pre,
-nav {
-  font-family: 'Terminus' !important;
-  font-size: 80% !important;
-}
-nav a {
-  color: #302a3f;
-}
-body,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: 'Terminus';
-}
-.tag {
-  color: #3f3f3f;
-  font-family: 'Terminus';
-  font-size: 80%;
-  background-color: #e0e0e0;
-  padding: 2px;
-  font-weight: normal;
-}
-pre.src-emacs-lisp:before {
-  content: 'Emacs Lisp';
-}
 pre.src {
   font-family: 'Terminus';
   background: #3f3f3f;
   color: #dcdccc;
-}
-pre.src:before {
-  background-color: #4f4f4f !important;
-  color: #f0dfaf !important;
-  font-weight: bold !important;
-  display: inline !important;
 }
 .org-preprocessor {
   color: #8cd0d3;
@@ -156,550 +116,94 @@ pre.src:before {
   color: #7f9f7f;
 }
 #+end_src
-** Simple.css
-[[https://github.com/kevquirk/simple.css/]]
+** basic.css
+:PROPERTIES:
+:CREATED:  [2022-08-08 21:07]
+:END:
 #+begin_src css
-:root {
-  --sans-font: "Terminus";
-  --mono-font: "Terminus";
+ * {box-sizing: border-box}
 
-  --bg: #fff;
-  --accent-bg: #f5f7ff;
-  --text: #212121;
-  --text-light: #585858;
-  --border: #d8dae1;
-  --accent: #0d47a1;
-  --code: #d81b60;
-  --preformatted: #444;
-  --marked: #ffdd33;
-  --disabled: #efefef;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #212121;
-    --accent-bg: #2b2b2b;
-    --text: #dcdcdc;
-    --text-light: #ababab;
-    --border: #666;
-    --accent: #ffb300;
-    --code: #f06292;
-    --preformatted: #ccc;
-    --disabled: #111;
-  }
-  /* Add a bit of transparancy so light media isn't so glaring in dark mode */
-  img,
-  video {
-    opacity: 0.8;
-  }
-}
 
 html {
-  /* Set the font globally */
-  font-family: var(--sans-font);
-  scroll-behavior: smooth;
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+
 }
 
-/* Make the body a nice central block */
+/* General settings */
+
 body {
-  color: var(--text);
-  background: var(--bg);
-  font-size: 1.15rem;
-  line-height: 1.5;
-  display: grid;
-  grid-template-columns:
-    1fr min(45rem, 90%) 1fr;
-  margin: 0;
+    margin: 0;
+    font: var(--sans);
+    font-weight: 400;
+    font-style: normal;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    background-color: var(--c3);
+    color: var(--c4);
 }
+img, iframe {border: none; max-width: 100%}
 
-body>* {
-  grid-column: 2;
-}
-
-/* Make the header bg full width, but the content inline with body */
-body > header {
-  background: var(--accent-bg);
-  border-bottom: 1px solid var(--border);
-  text-align: center;
-  padding: 0 0.5rem 2rem 0.5rem;
-  grid-column: 1 / -1;
-  box-sizing: border-box;
-}
-
-body > header h1 {
-  max-width: 1200px;
-  margin: 1rem auto;
-}
-
-body > header p {
-  max-width: 40rem;
-  margin: 1rem auto;
-}
-
-/* Add a little padding to ensure spacing is correct between content and nav */
-main {
-  padding-top: 1.5rem;
-}
-
-body > footer {
-  margin-top: 4rem;
-  padding: 2rem 1rem 1.5rem 1rem;
-  color: var(--text-light);
-  font-size: 0.9rem;
-  text-align: center;
-  border-top: 1px solid var(--border);
-}
-
-/* Format headers */
-h1 {
-  font-size: 3rem;
-}
-
-h2 {
-  font-size: 2.6rem;
-  margin-top: 3rem;
-}
-
-h3 {
-  font-size: 2rem;
-  margin-top: 3rem;
-}
-
-h4 {
-  font-size: 1.44rem;
-}
-
-h5 {
-  font-size: 1.15rem;
-}
-
-h6 {
-  font-size: 0.96rem;
-}
-
-/* Fix line height when title wraps */
-h1,
-h2,
-h3 {
-  line-height: 1.1;
-}
-
-/* Reduce header size on mobile */
-@media only screen and (max-width: 720px) {
-  h1 {
-    font-size: 2.5rem;
-  }
-
-  h2 {
-    font-size: 2.1rem;
-  }
-
-  h3 {
-    font-size: 1.75rem;
-  }
-
-  h4 {
-    font-size: 1.25rem;
-  }
-}
-
-/* Format links & buttons */
-a,
-a:visited {
-  color: var(--accent);
-}
-
-a:hover {
-  text-decoration: none;
-}
-
-button,
-[role="button"],
-input[type="submit"],
-input[type="reset"],
-input[type="button"] {
-  border: none;
-  border-radius: 5px;
-  background: var(--accent);
-  font-size: 1rem;
-  color: var(--bg);
-  padding: 0.7rem 0.9rem;
-  margin: 0.5rem 0;
-}
-
-button[disabled],
-[role="button"][aria-disabled="true"],
-input[type="submit"][disabled],
-input[type="reset"][disabled],
-input[type="button"][disabled],
-input[type="checkbox"][disabled],
-input[type="radio"][disabled],
-select[disabled] {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-input:disabled,
-textarea:disabled,
-select:disabled {
-  cursor: not-allowed;
-  background-color: var(--disabled);
-}
-
-input[type="range"] {
-  padding: 0;
-}
-
-/* Set the cursor to '?' while hovering over an abbreviation */
-abbr {
-  cursor: help;
-}
-
-button:focus,
-button:enabled:hover,
-[role="button"]:focus,
-[role="button"]:not([aria-disabled="true"]):hover,
-input[type="submit"]:focus,
-input[type="submit"]:enabled:hover,
-input[type="reset"]:focus,
-input[type="reset"]:enabled:hover,
-input[type="button"]:focus,
-input[type="button"]:enabled:hover {
-  filter: brightness(1.4);
-  cursor: pointer;
-}
-
-/* Format navigation */
-header > nav {
-  font-size: 1rem;
-  line-height: 2;
-  padding: 1rem 0 0 0;
-}
-
-/* Use flexbox to allow items to wrap, as needed */
-header > nav ul,
-header > nav ol {
-  align-content:   space-around;
-  align-items:     center;
-  display:         flex;
-  flex-direction:  row;
-  justify-content: center;
-  list-style-type: none;
-  margin:          0;
-  padding:         0;
-}
-
-/* List items are inline elements, make them behave more like blocks */
-header > nav ul li,
-header > nav ol li {
-  display: inline-block;
-}
-
-header > nav a,
-header > nav a:visited {
-  margin: 0 1rem 1rem 0;
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  color: var(--text);
-  display: inline-block;
-  padding: 0.1rem 1rem;
-  text-decoration: none;
-}
+a {color: var(--c1);  text-decoration:none}
 
-header > nav a:hover {
-  color: var(--accent);
-  border-color: var(--accent);
-}
-
-header > nav a:last-child {
-  margin-right: 0;
-}
-
-/* Reduce nav side on mobile */
-@media only screen and (max-width: 720px) {
-  header > nav a {
-    border: none;
-    padding: 0;
-    color: var(--accent);
-    text-decoration: underline;
-    line-height: 1;
-  }
-}
-
-aside {
-  width: 30%;
-  padding: 0 15px;
-  margin-left: 15px;
-  float: right;
-  background: var(--accent-bg);
-  border: 1px solid var(--border);
-  border-radius: 5px;
-}
-
-article {
-  border: 1px solid var(--border);
-  padding: 1rem;
-  border-radius: 5px;
-}
-
-article h2:first-child,
-section h2:first-child {
-  margin-top: 1rem;
-}
-
-section {
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  padding: 2rem 1rem;
-  margin: 3rem 0;
-}
+a:hover {color: var(--c1); text-decoration: underline}
 
-/* Format the expanding box */
-details {
-  background: var(--accent-bg);
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  margin-bottom: 1rem;
-}
-
-summary {
-  cursor: pointer;
-  font-weight: bold;
-  padding: 0.6rem 1rem;
-}
-
-details[open] {
-  padding: 0.6rem 1rem 0.75rem 1rem;
-}
-
-details[open] summary + * {
-  margin-top: 0;
-}
-
-details[open] summary {
-  margin-bottom: 0.5rem;
-  padding: 0;
-}
+pre {font: 1em/1.6 var(--mono); background: var(--c2); padding: 1em; overflow: auto}
 
-details[open] > *:last-child {
-  margin-bottom: 0;
-}
-
-/* Format tables */
-table {
-  border-collapse: collapse;
-  display: block;
-  margin: 1.5rem 0;
-  overflow: auto;
-  width: 100%;
-}
+code {font: 1em/1.6 var(--mono);}
 
-td,
-th {
-  border: 1px solid var(--border);
-  text-align: left;
-  padding: 0.5rem;
-}
+blockquote {border-left: 5px solid var(--c2); padding: 1em 1.5em; margin: 0}
 
-th {
-  background: var(--accent-bg);
-  font-weight: bold;
-}
+hr {border:0; border-bottom: 1px solid var(--c4)}
 
-tr:nth-child(even) {
-  /* Set every other cell slightly darker. Improves readability. */
-  background: var(--accent-bg);
-}
+ /* Headlines */
 
-table caption {
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-}
+h1,h2,h3,h4,h5,h6 {margin: 0.6em 0; font-weight: normal}
 
-/* Format forms */
-textarea,
-select,
-input {
-  font-size: inherit;
-  font-family: inherit;
-  padding: 0.5rem;
-  margin-bottom: 0.5rem;
-  color: var(--text);
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  box-shadow: none;
-  box-sizing: border-box;
-  width: 60%;
-  -moz-appearance: none;
-  -webkit-appearance: none;
-  appearance: none;
-}
+h1 {font-size: 2.625em; line-height: 1.2}
 
-/* Add arrow to drop-down */
-select {
-  background-image: linear-gradient(45deg, transparent 49%, var(--text) 51%),
-    linear-gradient(135deg, var(--text) 51%, transparent 49%);
-  background-position: calc(100% - 20px), calc(100% - 15px);
-  background-size: 5px 5px, 5px 5px;
-  background-repeat: no-repeat;
-}
+h2 {font-size: 1.625em; line-height: 1.2}
 
-select[multiple] {
-  background-image: none !important;
-}
+h3 {font-size: 1.3125em; line-height: 1.24}
 
-/* checkbox and radio button style */
-input[type="checkbox"],
-input[type="radio"] {
-  vertical-align: middle;
-  position: relative;
-}
+h4 {font-size: 1.1875em; line-height: 1.23}
 
-input[type="radio"] {
-  border-radius: 100%;
-}
+h5,h6 {font-size: 1em; font-weight:bold}
 
-input[type="checkbox"]:checked,
-input[type="radio"]:checked {
-  background: var(--accent);
-}
+/* Table */
 
-input[type="checkbox"]:checked::after {
-  /* Creates a rectangle with colored right and bottom borders which is rotated to look like a check mark */
-  content: " ";
-  width: 0.1em;
-  height: 0.25em;
-  border-radius: 0;
-  position: absolute;
-  top: 0.05em;
-  left: 0.18em;
-  background: transparent;
-  border-right: solid var(--bg) 0.08em;
-  border-bottom: solid var(--bg) 0.08em;
-  font-size: 1.8em;
-  transform: rotate(45deg);
-}
-input[type="radio"]:checked::after {
-  /* creates a colored circle for the checked radio button  */
-  content: " ";
-  width: 0.25em;
-  height: 0.25em;
-  border-radius: 100%;
-  position: absolute;
-  top: 0.125em;
-  background: var(--bg);
-  left: 0.125em;
-  font-size: 32px;
-}
+table {border-collapse: collapse; border-spacing: 0; margin:1em 0}
 
-/* Make the textarea wider than other inputs */
-textarea {
-  width: 80%;
-}
+th, td {text-align: left; vertical-align: top; border: 1px solid; padding: 0.4em}
 
-/* Makes input fields wider on smaller screens */
-@media only screen and (max-width: 720px) {
-  textarea,
-  select,
-  input {
-    width: 100%;
-  }
-}
+thead,tfoot {background: var(--c2)}
 
-/* Ensures the checkbox and radio inputs do not have a set width like other input fields */
-input[type="checkbox"],
-input[type="radio"] {
-  width: auto;
-}
+/* Rounded Corners*/
 
-/* do not show border around file selector button */
-input[type="file"] {
-  border: 0;
-}
+pre,code,input,select,textarea,button,img {border-radius: var(--rc)}
 
-/* Misc body elements */
-hr {
-  color: var(--border);
-  border-top: 1px;
-  margin: 1rem auto;
-}
 
-mark {
-  padding: 2px 5px;
-  border-radius: 4px;
-  background: var(--marked);
-}
+/* Forms */
 
-main img,
-main video {
-  max-width: 100%;
-  height: auto;
-  border-radius: 5px;
-}
+input, select, textarea {font-size: 1em; color:var(--c4); background: var(--c2); border: 0; padding: 0.6em}
 
-figure {
-  margin: 0;
-  text-align: center;
-}
+button, input[type=submit], input[type=reset], input[type="button"] { -webkit-appearance: none; font-size: 1em; display: inline-block; color: var(--c5); background: var(--c1);  border: 0; margin: 4px;  padding: 0.6em; cursor: pointer; text-align: center}
 
-figcaption {
-  font-size: 0.9rem;
-  color: var(--text-light);
-  margin-bottom: 1rem;
-}
+button:hover, button:focus, input:hover, textarea:hover, select:hover {opacity: 0.8}
 
-blockquote {
-  margin: 2rem 0 2rem 2rem;
-  padding: 0.4rem 0.8rem;
-  border-left: 0.35rem solid var(--accent);
-  color: var(--text-light);
-  font-style: italic;
-}
+/* Infinite Grid */
 
-cite {
-  font-size: 0.9rem;
-  color: var(--text-light);
-  font-style: normal;
-}
+section {display: flex; flex-flow: row wrap}
 
-/* Use mono font for code elements */
-code,
-pre,
-pre span,
-kbd,
-samp {
-  font-family: var(--mono-font);
-  color: var(--code);
-}
+[style*="--c:"], section>section, aside, article {flex:var(--c,1); margin:var(--m1)}
 
-kbd {
-  color: var(--preformatted);
-  border: 1px solid var(--preformatted);
-  border-bottom: 3px solid var(--preformatted);
-  border-radius: 5px;
-  padding: 0.1rem 0.4rem;
-}
+/* Cards */
 
-pre {
-  padding: 1rem 1.4rem;
-  max-width: 100%;
-  overflow: auto;
-  color: var(--preformatted);
-  background: var(--accent-bg);
-  border: 1px solid var(--border);
-  border-radius: 5px;
-}
+article {background: var(--c2); border-radius: var(--rc); padding: 1em; box-shadow: 0px 1px 0px rgba(0,0,0,0.3)}
 
-/* Fix embedded code within pre */
-pre code {
-  color: var(--preformatted);
-  background: none;
-  margin: 0;
-  padding: 0;
-}
+[style*="--c:"]:first-child, section>section:first-child, article:first-child {margin-left:0}
+[style*="--c:"]:last-child, section>section:last-child, article:last-child {margin-right:0}
 #+end_src
-
 * LANDING
 test landing page.
 * STATIC
@@ -710,6 +214,11 @@ content2
 * BLOG
 ** first post
 :PROPERTIES:
-:CREATED:  [2022-06-27 pon 02:56]
+:CREATED:  [2022-06-27 02:56]
 :END:
 bork, bork, bork~
+** second post
+:PROPERTIES:
+:CREATED:  [2022-07-09 14:02]
+:END:
+bla bla bla~

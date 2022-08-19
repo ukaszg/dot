@@ -5,10 +5,10 @@
 ;; Author: Łukasz Gruner <lukasz@gruner.lu>
 ;; Maintainer: Łukasz Gruner <lukasz@gruner.lu>
 ;; Created: 17-06-2022
-;; Modified: 20-06-2022
+;; Modified: 20-08-2022
 ;; Version: 0.0.1
 ;; URL: https://github.com/ukaszg/dot
-;; Package-Requires: ((emacs "28"))
+;; Package-Requires: ((emacs "28.1"))
 ;;
 ;; This file is not part of GNU Emacs.
 ;;
@@ -29,6 +29,9 @@
 (require 'ox-html)
 (require 'ob-tangle)
 
+(defconst site-setupfile (file-truename "./setupfile.org")
+  "Default setupfile for generated org files.")
+
 (defun site--get-title ()
   "Return page title for the current entry."
   (let ((case-fold-search t))
@@ -44,9 +47,7 @@
     (let ((title      (or page-title (site--get-title)))
           (full-path  (file-truename (if path (expand-file-name path dir) dir)))
           (setup-full (file-truename (or setupfile
-                                         (expand-file-name
-                                          "setupfile.org"
-                                          (file-name-directory (buffer-file-name))))))
+                                         site-setupfile)))
           org-export-show-temporary-export-buffer)
       (unless subtreep (org-narrow-to-subtree))
       (org-org-export-as-org nil subtreep)
@@ -71,25 +72,28 @@ present to know source file and directory to write to."
                    (error "No property :directory")))
          (buff (or (org-find-base-buffer-visiting file)
                    (find-file-noselect file)
-                   (error "No such file %s" file))))
+                   (error "No such file %s" file)))
+         title)
     (save-excursion
       (with-current-buffer buff
+        (setq title (cadar (org-collect-keywords '("TITLE"))))
         (widen)
         (org-show-all)
         (save-match-data
           (goto-char (point-min))
           (when (re-search-forward "^\* LANDING" nil t)
-            (site--export-subtree-as-org
-             base (cadar (org-collect-keywords '("TITLE"))) nil nil t))
+            (site--export-subtree-as-org base title nil nil t))
           (goto-char (point-min))
           (when (re-search-forward "^\* STATIC" nil t)
             (let ((cur-point (point)))
               (org-next-visible-heading 1) ;; go inside
               (while (not (eq (point) cur-point))
                 (site--export-subtree-as-org
-                 base nil (replace-regexp-in-string "[\t ]" "_" (site--get-title)) nil t)
-                (org-forward-heading-same-level 1 t)
-                (setq cur-point (point)))))
+                 base nil
+                 (replace-regexp-in-string "[^A-Za-z0-9]" "_" (site--get-title))
+                 nil t)
+                (setq cur-point (point))
+                (org-forward-heading-same-level 1 t))))
           (goto-char (point-min))
           (when (re-search-forward "^\* BLOG" nil t)
             (let ((cur-point (point))
@@ -101,14 +105,27 @@ present to know source file and directory to write to."
                            "blog/%s/"
                            (replace-regexp-in-string "[^A-Za-z0-9]" "_" (site--get-title))))
                 (site--export-subtree-as-org base nil url)
-                (push (list :url (concat "/kasz/" url)
+                (push (list :url url
                             :title (site--get-title)
                             :date (org-entry-get nil "CREATED"))
                       articles)
-                (org-forward-heading-same-level 1 t)
-                (setq cur-point (point)))
-              ;; TODO: add blog index
-              (message "###: %s :###" articles) )))))))
+                (setq cur-point (point))
+                (org-forward-heading-same-level 1 t))
+              (let ((file (expand-file-name "blog/index.org" base))
+                    (prefix "https://gruner.lu/kasz/"))
+                (with-temp-file file
+                  (insert (format "#+SETUPFILE: %s\n" site-setupfile))
+                  (insert (format "#+TITLE: %s: Blog\n" title))
+                  (insert "\n")
+                  ;; TODO: Parse date and sort by that.
+                  ;; Currently this relies on the fact that my date format is sortable alphabetically.
+                  (sort articles (lambda (first second)
+                                   (string< (plist-get first :date)
+                                            (plist-get second :date))))
+                  (dolist (article articles)
+                    (insert (format "- [[%s][%s]]\n"
+                                    (concat prefix (plist-get article :url))
+                                    (plist-get article :title)))))))))))))
 
 (defun site-preparation-function-css (props)
   "Tangles css file from toplevel subtree named 'CSS'.
@@ -132,22 +149,8 @@ present to know source file and directory to write to."
             (org-babel-tangle nil base "css")
             (widen)))))))
 
-(setq org-html-doctype "html5"
-      org-html-html5-fancy t
-      org-html-container-element "section"
-      org-html-divs '((preamble  "header" "preamble")
-                      (content   "article" "content")
-                      (postamble "footer" "postamble"))
-      org-html-checkbox-type 'unicode
-      org-html-metadata-timestamp-format "%Y-%m-%d"
-      org-html-head-include-default-style nil
-      org-html-head-include-scripts nil
-      org-export-allow-bind-keywords t
-      org-html-self-link-headlines t
-      org-html-htmlize-output-type 'css)
-
-(let ((pub-dir (expand-file-name "_out/kasz" (file-name-directory (buffer-file-name))))
-      (src-dir (file-truename (file-name-directory (buffer-file-name))))
+(let ((pub-dir (file-truename "./_out/kasz"))
+      (src-dir (file-truename "./"))
       (tmp-dir (make-temp-file "site" t)))
   (setq org-publish-project-alist
         `(("css"
