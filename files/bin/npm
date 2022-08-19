@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec wsl-context-do.fish npm.cmd /usr/bin/npm "$@"

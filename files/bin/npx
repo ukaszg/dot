@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec wsl-context-do.fish npx.cmd /usr/bin/npx "$@"
