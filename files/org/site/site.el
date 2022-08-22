@@ -28,6 +28,7 @@
 (require 'ox-org)
 (require 'ox-html)
 (require 'ob-tangle)
+(require 's)
 
 (defconst site-setupfile (file-truename "./setupfile.org")
   "Default setupfile for generated org files.")
@@ -40,6 +41,14 @@
       (save-match-data
         (when (looking-at org-complex-heading-regexp)
           (match-string 4))))))
+
+(defun site--get-url ()
+  "Return dirname from title."
+  (s-downcase
+   (save-match-data
+     (replace-regexp-in-string "[^A-Za-z0-9]"
+                               "_"
+                               (site--get-title)))))
 
 (defun site--export-subtree-as-org (dir &optional page-title path setupfile subtreep)
   "Export subtree under point as an org file under `DIR'."
@@ -89,9 +98,7 @@ present to know source file and directory to write to."
               (org-next-visible-heading 1) ;; go inside
               (while (not (eq (point) cur-point))
                 (site--export-subtree-as-org
-                 base nil
-                 (replace-regexp-in-string "[^A-Za-z0-9]" "_" (site--get-title))
-                 nil t)
+                 base nil (site--get-url) nil t)
                 (setq cur-point (point))
                 (org-forward-heading-same-level 1 t))))
           (goto-char (point-min))
@@ -101,9 +108,7 @@ present to know source file and directory to write to."
                   articles)
               (org-next-visible-heading 1) ;; go inside
               (while (not (eq (point) cur-point))
-                (setq url (format
-                           "blog/%s/"
-                           (replace-regexp-in-string "[^A-Za-z0-9]" "_" (site--get-title))))
+                (setq url (format "./%s/" (site--get-url)))
                 (site--export-subtree-as-org base nil url)
                 (push (list :url url
                             :title (site--get-title)
@@ -111,21 +116,20 @@ present to know source file and directory to write to."
                       articles)
                 (setq cur-point (point))
                 (org-forward-heading-same-level 1 t))
-              (let ((file (expand-file-name "blog/index.org" base))
-                    (prefix "https://gruner.lu/kasz/"))
-                (with-temp-file file
-                  (insert (format "#+SETUPFILE: %s\n" site-setupfile))
-                  (insert (format "#+TITLE: %s: Blog\n" title))
-                  (insert "\n")
-                  ;; TODO: Parse date and sort by that.
-                  ;; Currently this relies on the fact that my date format is sortable alphabetically.
-                  (sort articles (lambda (first second)
-                                   (string< (plist-get first :date)
-                                            (plist-get second :date))))
-                  (dolist (article articles)
-                    (insert (format "- [[%s][%s]]\n"
-                                    (concat prefix (plist-get article :url))
-                                    (plist-get article :title)))))))))))))
+              (with-temp-file (expand-file-name "blog/index.org" base)
+                (insert (format "#+SETUPFILE: %s\n" site-setupfile))
+                (insert (format "#+TITLE: %s: Blog\n" title))
+                (insert "\n")
+                ;; TODO: Parse date and sort by that.
+                ;; Currently this relies on the fact that my date format is sortable alphabetically.
+                (sort articles (lambda (first second)
+                                 (string< (plist-get first :date)
+                                          (plist-get second :date))))
+                (dolist (article articles)
+                  (insert (format "* [[%s][%s]]\n:PROPERTIES:\n:CREATED: %s\n:END:\n\n"
+                                  (plist-get article :url)
+                                  (plist-get article :title)
+                                  (plist-get article :date))))))))))))
 
 (defun site-preparation-function-css (props)
   "Tangles css file from toplevel subtree named 'CSS'.

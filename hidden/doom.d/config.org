@@ -1,17 +1,9 @@
 #+TITLE: doom-literate-config
+#+SETUPFILE: ~/org/site/setupfile.org
 #+DESCRIPTION: Doom Emacs literate config.
-#+LANGUAGE: en
 #+TAGS: package(p) advice(a) disabled(d) hook(h) bind(b) setq(s) popup(u) hack(H)
-#+TODO: TODO
-#+OPTIONS: html-postamble:nil html-preamble:nil html-scripts:nil html-style:nil
-#+OPTIONS: tags:nil tasks:t todo:t inline:t num:nil toc:nil
-#+STARTUP: indent hidestars show2levels
-#+HTML_DOCTYPE: html5
-#+HTML_HTML5_FANCY: t
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="/kasz/style.css" />
 #+PROPERTY: header-args:emacs-lisp :tangle ~/.doom.d/config.el :tangle-mode (identity #o400) :results silent :exports code :lexical yes :mkdirp no
-#+EXPORT_FILE_NAME: index.html
-#+LINK_HOME: https://gruner.lu/kasz/
+#+TODO: TODO
 
 * =*DOOM*=
 ** Add file headers
@@ -25,7 +17,7 @@
 #+end_src
 *** load or create =custom.el=                                          :setq:
 #+begin_src emacs-lisp
-(setq! custom-file (expand-file-name "custom.el" doom-private-dir))
+(setq! custom-file (expand-file-name "custom.el" doom-user-dir))
 (if (file-exists-p custom-file)
     (load custom-file)
   (with-temp-file custom-file
@@ -73,18 +65,30 @@ Some modes don't require macros (like most RO buffers).
 (defun uki/wsl-paste ()
   "Paste using Windows' clipboard."
   (interactive)
-  (let ((text (shell-command-to-string "winclip.sh")))
-    ;; fix newlines
-    (setq text (replace-regexp-in-string "\r" "" text))
-    ;; powershell adds an extra newline
-    (setq text (substring text 0 -1))
-    (insert text)))
+  (save-excursion
+    (let ((text (shell-command-to-string "winclip.sh")))
+      ;; fix newlines
+      (setq text (replace-regexp-in-string "\r" "" text))
+      ;; powershell adds an extra newline
+      (setq text (substring text 0 -1))
+      (insert text))))
 #+end_src
-*** Set `$EMACS` variable for wsl wrapper scripts
+*** Set `$EMACS` variable for wsl wrapper script
 My script [[~/bin/wsl-context-do.fish]] expects EMACS env var to be present.
 This allows to run only wsl versions of wrapped commands.
 #+begin_src emacs-lisp
 (setenv "EMACS" "yes")
+#+end_src
+*** Enable-mode-hook
+:PROPERTIES:
+:CREATED:  [2022-08-19 21:20]
+:END:
+#+begin_src emacs-lisp
+(defmacro uki/enable-mode-hook (mode)
+  "Create function that enables `MODE' for use in hooks."
+  `(defun ,(make-symbol (concat "enable-mode--" (symbol-name mode) "--h")) ()
+       ,(format "Enables mode `%s'." mode)
+       (,mode 1)))
 #+end_src
 * Minor-modes
 ** =Builtin= and one-liners
@@ -97,9 +101,9 @@ This allows to run only wsl versions of wrapped commands.
 ~doom-zenburn-theme~ is installed by =:ui doom=
 #+begin_src emacs-lisp
 (setq! doom-theme               'doom-zenburn
-       doom-variable-pitch-font "DejaVu Sans:size=12"
-       doom-font                "Terminus:size=16"
-       doom-big-font            "Terminus:size=24")
+       doom-variable-pitch-font "DejaVu Sans:size=12:antialias=off"
+       doom-font                "Terminus:size=16:antialias=off"
+       doom-big-font            "Terminus:size=24:antialias=off")
 #+end_src
 *** Start maximized
 #+begin_src emacs-lisp
@@ -181,18 +185,35 @@ This allows to run only wsl versions of wrapped commands.
       (cl-pushnew 'textlint flycheck-disabled-checkers))))
 #+end_src
 ** LSP
+*** Settings
 #+begin_src emacs-lisp
 (after! lsp
   (require 'lsp-ui)
   (setq! lsp-enable-symbol-highlighting nil
          lsp-ui-doc-enable t
-         lsp-ui-doc-show-with-mouse t
+         lsp-ui-doc-show-with-mouse nil
          lsp-ui-doc-show-with-cursor nil
          lsp-lens-enable t
          lsp-headerline-breadcrumb-enable nil
          lsp-ui-sideline-enable t
-         lsp-ui-sideline-show-code-actions t
+         lsp-ui-sidelin-show-code-actions t
          lsp-ui-sideline-show-hover t))
+#+end_src
+** Treemacs
+:PROPERTIES:
+:CREATED:  [2022-08-19 20:57]
+:END:
+*** Sync with LSP workspace
+#+begin_src emacs-lisp
+(after! treemacs
+  (add-hook! 'treemacs-mode-hook
+    (uki/enable-mode-hook lsp-treemacs-sync-mode)))
+#+end_src
+*** Enable follow mode
+#+begin_src emacs-lisp
+(after! treemacs
+  (add-hook! 'treemacs-mode-hook
+    (uki/enable-mode-hook treemacs-follow-mode)))
 #+end_src
 * Major-modes
 ** Messages
@@ -279,8 +300,7 @@ Why so complicated? [[https://nullprogram.com/blog/2019/12/10/#cl-first]]
 #+end_src
 *** My ~org-directory~                                                  :setq:
 #+begin_src emacs-lisp
-(after! org
-  (setq! org-directory (file-truename "~/org/")))
+(setq! org-directory (file-truename "~/org/"))
 #+end_src
 *** Bind ~org-babel-tangle~ under :localleader                          :bind:
 #+begin_src emacs-lisp
@@ -336,22 +356,15 @@ Why so complicated? [[https://nullprogram.com/blog/2019/12/10/#cl-first]]
 #+end_src
 *** Add timestamps to new headings                                      :hook:
 #+begin_src emacs-lisp
-(defun uki/org-set-created-time (&optional active name)
-  "Set a property on the entry giving the creation time.
-
-By default the property is called CREATED. If given, the `NAME'
-argument will be used instead. If the property already exists, it
-will not be modified."
-  (interactive)
-  (let* ((created (or name "CREATED"))
-         (fmt (if active "<%s>" "[%s]"))
-         (now  (format fmt (format-time-string "%Y-%m-%d %a %H:%M"))))
-    (save-excursion
-      (unless (org-entry-get (point) created nil)
-        (org-set-property created now)))))
-
 (after! org
-  (add-hook 'org-insert-heading-hook #'uki/org-set-created-time))
+  (add-hook! 'org-insert-heading-hook
+    (defun uki/org-set-created-time ()
+      "Sets CREATED property on the entry giving the creation time.
+If the property already exists, it will not be modified."
+      (interactive)
+      (save-excursion
+        (unless (org-entry-get (point) "CREATED" nil)
+          (org-set-property "CREATED" (format-time-string "[%Y-%m-%d %H:%M]")))))))
 #+end_src
 ** Info
 *** Automatically view '.info' files instead of editing them            :setq:
@@ -395,14 +408,28 @@ will not be modified."
 (after! lsp-java
   (let ((formatter (expand-file-name "~/.formatter.xml")))
     (if (file-exists-p formatter)
-      (setq! lsp-java-format-enabled t
-             lsp-java-format-settings-url formatter)
+        (setq! lsp-java-format-enabled t
+               lsp-java-format-settings-profile "default"
+               lsp-java-format-settings-url formatter)
       (message "No formatter file present: %s" formatter))))
 #+end_src
 *** Always use code blocks
 #+begin_src emacs-lisp
 (after! lsp-java
   (setq! lsp-java-code-generation-use-blocks t))
+#+end_src
+*** Settings
+:PROPERTIES:
+:CREATED:  [2022-08-19 20:19]
+:END:
+#+begin_src emacs-lisp
+(after! lsp-java
+  (setq! lsp-java-java-path "/usr/bin/java"
+         lsp-java-dependency-package-representation "hierarchical"
+         lsp-java-maven-download-sources t
+         lsp-java-references-code-lens-enabled t
+         lsp-java-configuration-maven-user-settings (expand-file-name "~/.m2/settings.xml")
+         lsp-java-save-actions-organize-imports t))
 #+end_src
 ** Compilation
 *** Have <q> exit window                                           :hook:bind:
@@ -431,5 +458,5 @@ As a workaround I disable literate autotangle.
 
 And then add following at the end of =config.org= (this will also compile tangled files).
 : # Local Variables:
-: # eval: (add-hook! 'after-save-hook :local (progn (org-babel-tangle) (byte-recompile-directory doom-private-dir 0 t)))
+: # eval: (add-hook! 'after-save-hook :local (progn (org-babel-tangle) (byte-recompile-directory doom-user-dir 0 t)))
 : # End:

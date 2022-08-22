@@ -38,6 +38,9 @@
 (require 'use-package)
 
 ;; Install other dependencies
+(use-package s
+  :ensure t)
+
 (use-package htmlize
   :ensure t)
 
@@ -60,7 +63,6 @@
 
 (use-package webfeeder
   :ensure t)
-
 
 (add-to-list 'load-path default-directory)
 (require 'site)
