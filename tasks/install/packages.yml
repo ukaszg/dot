@@ -59,6 +59,7 @@
           - grep
           - htop
           - jq
+          - keychain
           - libtool-bin
           - lintian
           - gnutls-bin

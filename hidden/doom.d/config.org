@@ -215,6 +215,42 @@ This allows to run only wsl versions of wrapped commands.
   (add-hook! 'treemacs-mode-hook
     (uki/enable-mode-hook treemacs-follow-mode)))
 #+end_src
+** Keychain
+:PROPERTIES:
+:CREATED:  [2022-08-22 11:14]
+:END:
+*** Package
+:PROPERTIES:
+:CREATED:  [2022-08-22 11:14]
+:END:
+#+begin_src emacs-lisp :tangle ~/.doom.d/packages.el
+(package! keychain-environment)
+#+end_src
+*** Autostart
+:PROPERTIES:
+:CREATED:  [2022-08-22 11:17]
+:END:
+#+begin_src emacs-lisp
+(add-hook! 'after-init-hook #'keychain-refresh-environment)
+#+end_src
+** Pinentry
+:PROPERTIES:
+:CREATED:  [2022-08-22 11:31]
+:END:
+*** Install
+:PROPERTIES:
+:CREATED:  [2022-08-22 11:31]
+:END:
+#+begin_src emacs-lisp :tangle ~/.doom.d/packages.el
+(package! pinentry)
+#+end_src
+*** Autostart
+:PROPERTIES:
+:CREATED:  [2022-08-22 11:40]
+:END:
+#+begin_src emacs-lisp
+;(add-hook! 'after-init-hook (pinentry-start))
+#+end_src
 * Major-modes
 ** Messages
 *** <q> emacs-buffer/window                                             :hook:
