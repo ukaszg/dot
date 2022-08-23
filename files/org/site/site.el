@@ -46,17 +46,15 @@
   "Return dirname from title."
   (s-downcase
    (save-match-data
-     (replace-regexp-in-string "[^A-Za-z0-9]"
-                               "_"
-                               (site--get-title)))))
+     (replace-regexp-in-string
+      "[^A-Za-z0-9]" "_" (site--get-title)))))
 
 (defun site--export-subtree-as-org (dir &optional page-title path setupfile subtreep)
   "Export subtree under point as an org file under `DIR'."
   (save-excursion
     (let ((title      (or page-title (site--get-title)))
           (full-path  (file-truename (if path (expand-file-name path dir) dir)))
-          (setup-full (file-truename (or setupfile
-                                         site-setupfile)))
+          (setup-full (file-truename (or setupfile site-setupfile)))
           org-export-show-temporary-export-buffer)
       (unless subtreep (org-narrow-to-subtree))
       (org-org-export-as-org nil subtreep)
@@ -108,7 +106,7 @@ present to know source file and directory to write to."
                   articles)
               (org-next-visible-heading 1) ;; go inside
               (while (not (eq (point) cur-point))
-                (setq url (format "./%s/" (site--get-url)))
+                (setq url (format "./blog/%s/" (site--get-url)))
                 (site--export-subtree-as-org base nil url)
                 (push (list :url url
                             :title (site--get-title)
@@ -116,20 +114,25 @@ present to know source file and directory to write to."
                       articles)
                 (setq cur-point (point))
                 (org-forward-heading-same-level 1 t))
-              (with-temp-file (expand-file-name "blog/index.org" base)
-                (insert (format "#+SETUPFILE: %s\n" site-setupfile))
-                (insert (format "#+TITLE: %s: Blog\n" title))
-                (insert "\n")
-                ;; TODO: Parse date and sort by that.
-                ;; Currently this relies on the fact that my date format is sortable alphabetically.
-                (sort articles (lambda (first second)
-                                 (string< (plist-get first :date)
-                                          (plist-get second :date))))
-                (dolist (article articles)
-                  (insert (format "* [[%s][%s]]\n:PROPERTIES:\n:CREATED: %s\n:END:\n\n"
-                                  (plist-get article :url)
-                                  (plist-get article :title)
-                                  (plist-get article :date))))))))))))
+              (setq articles
+                    ;; TODO: Parse date and sort by that.
+                    ;; Currently this relies on the fact that my date format is sortable alphabetically.
+                    (sort articles (lambda (first second)
+                                     (string< (plist-get first :date)
+                                              (plist-get second :date)))))
+              (let ((f (expand-file-name "blog/index.org" base)))
+                (with-temp-buffer
+                  (insert (format "#+SETUPFILE: %s\n" site-setupfile))
+                  (insert (format "#+TITLE: %s: Blog\n" title))
+                  (insert "\n")
+                  (mapc (lambda (e)
+                          (insert (format "* [[%s][%s]]\n:PROPERTIES:\n:CREATED: %s\n:END:\n\n"
+                                          (plist-get e :url)
+                                          (plist-get e :title)
+                                          (plist-get e :date))))
+                        articles)
+                  (setq buffer-file-name f)
+                  (basic-save-buffer))))))))))
 
 (defun site-preparation-function-css (props)
   "Tangles css file from toplevel subtree named 'CSS'.
