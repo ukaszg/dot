@@ -44,7 +44,7 @@
        :os         tty
        :lang       (cc +lsp) data emacs-lisp (go +lsp)
                    (java +lsp) (javascript +lsp) (json -lsp)
-                   lua markdown org (python +lsp) rest
+                   lua markdown (org +hugo) (python +lsp) rest
                    (sh +fish -lsp) (web +lsp) (yaml -lsp)
        :config     literate (default +bindings +smartparens))
 #+end_src
@@ -336,7 +336,7 @@ Why so complicated? [[https://nullprogram.com/blog/2019/12/10/#cl-first]]
 #+end_src
 *** My ~org-directory~                                                  :setq:
 #+begin_src emacs-lisp
-(setq! org-directory (file-truename "~/org/"))
+(setq! org-directory (file-truename "~/mnt/OneDrive/doc/"))
 #+end_src
 *** Bind ~org-babel-tangle~ under :localleader                          :bind:
 #+begin_src emacs-lisp
@@ -347,11 +347,6 @@ Why so complicated? [[https://nullprogram.com/blog/2019/12/10/#cl-first]]
 #+begin_src emacs-lisp
 (after! org
   (setq! org-return-follows-link t))
-#+end_src
-*** Publishing                                                          :setq:
-#+begin_src emacs-lisp
-(after! org
-  (load-file (expand-file-name "files/org/site/site.el" uki/dotfiles-dir)))
 #+end_src
 *** Have export dialog open in place and without modeline               :popup:
 #+begin_src emacs-lisp
