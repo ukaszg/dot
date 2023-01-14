@@ -1,5 +1,7 @@
 #!/usr/bin/env fish
 
+set -gx LIBGL_ALWAYS_INDIRECT=1
+
 # win11
 set -gx DISPLAY :0.0
 
