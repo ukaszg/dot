@@ -36,6 +36,7 @@
     glog = log --pretty=format:\"%C(yellow)%h%C(reset) %C(green)%ad%C(reset) %C(red)|%C(reset) %s %C(bold blue)[%an]%C(reset)%C(yellow)%d%C(reset)\" --graph --date=short
     prune = fetch --prune
     conflicts = !git diff --name-only --diff-filter=U | sort -u | xargs $EDITOR
+    sup = "!f() { git submodule foreach \"git checkout $1 && git pull --rebase\"; }; f"
 [commit]
     gpgSign = false
 [diff]

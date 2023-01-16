@@ -1,5 +1,6 @@
 #+TITLE: doom-literate-config
-#+SETUPFILE: ~/org/site/setupfile.org
+#+AUTHOR: Łukasz Gruner
+#+EMAIL: lukasz@gruner.lu
 #+DESCRIPTION: Doom Emacs literate config.
 #+TAGS: package(p) advice(a) disabled(d) hook(h) bind(b) setq(s) popup(u) hack(H)
 #+PROPERTY: header-args:emacs-lisp :tangle ~/.doom.d/config.el :tangle-mode (identity #o400) :results silent :exports code :lexical yes :mkdirp no
@@ -249,9 +250,21 @@ This allows to run only wsl versions of wrapped commands.
 :CREATED:  [2022-08-22 11:40]
 :END:
 #+begin_src emacs-lisp
-;(add-hook! 'after-init-hook (pinentry-start))
+(add-hook! 'after-init-hook (pinentry-start))
 #+end_src
 * Major-modes
+** Magit
+:PROPERTIES:
+:CREATED:  [2023-01-04 09:16]
+:END:
+*** Enable Gravatars
+:PROPERTIES:
+:CREATED:  [2023-01-04 09:16]
+:END:
+#+begin_src emacs-lisp
+(after! magit
+  (setq magit-revision-show-gravatars '("^Author:     " . "^Commit:     ")))
+#+end_src
 ** Messages
 *** <q> emacs-buffer/window                                             :hook:
 Messages buffer already exists so hook won't get called until it gets restarted. We need to modify bindings manually.
@@ -402,7 +415,7 @@ If the property already exists, it will not be modified."
 #+begin_src emacs-lisp
 (add-to-list 'auto-mode-alist
              (cons "\\.[iI][nN][fF][oO]\\'"
-                   (defun uki/reopen-file-in-info-mode-h ()
+                   (defun uki/reopen-file-in-info-mode ()
                      "Re-run this in an info viewer."
                      (interactive)
                      (let ((file-name (buffer-file-name)))
