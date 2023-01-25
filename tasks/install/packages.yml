@@ -23,7 +23,7 @@
 
     - name: Add nodejs 14.x repository
       apt_repository:
-        repo: "deb https://deb.nodesource.com/node_14.x {{ ubuntu_version }} main"
+        repo: "deb https://deb.nodesource.com/node_16.x {{ ubuntu_version }} main"
 
     - name: Install my packages
       ignore_errors: yes
@@ -55,7 +55,7 @@
           - fonts-terminus
           - glslang-tools
           - git
-          - golang-1.16
+          - golang-1.18
           - grep
           - htop
           - jq
@@ -68,8 +68,6 @@
           - pandoc
           - python-is-python3
           - python3-pip
-          - ranger
-          - rust-all
           - shellcheck
           - sqlite3
           - sudo
@@ -85,11 +83,7 @@
           - xfonts-terminus-oblique
 
     - name: Install vim-plug for vim
-      shell: |
-          mkdir -p "~/.vim/autoload/"
-          cd "~/.vim/autoload/"
-          wget https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-          dos2unix "${DIR}/plug.vim"
+      shell: mkdir -p ~/.vim/autoload/ && curl -sL https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim | dos2unix | tee ~/.vim/autoload/plug.vim
       args:
         creates: ~/.vim/autoload/plug.vim
         warn: false
@@ -135,4 +129,4 @@
         rm -f /tmp/ripgrep.deb
       args:
         creates: /usr/bin/rg
-      become: false
+        warn: false

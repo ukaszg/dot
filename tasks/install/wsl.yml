@@ -7,9 +7,9 @@
       - Mozilla.Firefox
       - Microsoft.Skype
       - Valve.Steam
-      - Python.Python.3
+      - Python.Python.3.8
       - Microsoft.OpenJDK.11
-      - GoLang.Go
+      - GoLang.Go.1.18
       - Git.Git
       - flux.flux
       - TheDocumentFoundation.LibreOffice
