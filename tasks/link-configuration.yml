@@ -28,7 +28,6 @@
       file:
         src: "{{ item['path'] }}"
         dest: "{{ item['path']|replace(hidden_dir, home+'.') }}"
-        state: link
       loop: "{{ hidden_files.files }}"
 
     - name: Gather a list of regular files
@@ -78,19 +77,29 @@
 
     - name: Ensure .gitconfig.local is present
       file:
-        dest: "{{ home }}.gitconfig.local"
+        dest: "{{ userprofile.stdout }}/.gitconfig.local"
         state: touch
 
-    - name: Copy a new version of .gitconfig.local to windows if exists
+    - name: Link .gitconfig.local from windows if exists
+      file:
+        src: "{{ userprofile.stdout }}/.gitconfig.local"
+        dest: "{{ home }}.gitconfig.local"
+
+    - name: Ensure .local.fish file on windows
       copy:
-        src: "{{ home }}.gitconfig.local"
-        dest: "{{ userprofile.stdout }}/.gitconfig.local"
-        force: true
+        src: "{{ src_dir }}dot.local.fish.example"
+        dest: "{{ userprofile.stdout }}/.local.fish"
+
+    - name: Link .local.fish from windows if exists
+      file:
+        src: "{{ userprofile.stdout }}/.local.fish"
+        dest: "{{ home }}.local.fish"
 
     - name: Link /etc/wsl.conf
       file:
         src: "{{ src_dir }}wsl.conf"
         dest: "/etc/wsl.conf"
         mode: '0644'
+        state: hard
       become: true
 
