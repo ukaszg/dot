@@ -146,6 +146,13 @@ This allows to run only wsl versions of wrapped commands.
 (setq-hook! '(prog-mode-hook org-mode-hook)
   whitespace-style '(face trailing))
 #+end_src
+*** Enable native compilation of packages
+:PROPERTIES:
+:CREATED:  [2023-01-25 00:28]
+:END:
+#+begin_src emacs-lisp
+(setq! package-native-compile t)
+#+end_src
 ** Consult
 *** Buffer list filtering
 #+begin_src emacs-lisp
