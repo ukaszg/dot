@@ -183,6 +183,14 @@ This allows to run only wsl versions of wrapped commands.
       "<up>"    #'evil-window-up
       "<down>"  #'evil-window-down)
 #+end_src
+*** Enable =vimish-fold-mode= globally
+:PROPERTIES:
+:CREATED:  [2023-01-20 16:33]
+:END:
+#+begin_src emacs-lisp
+(after! vimish-fold
+  (vimish-fold-global-mode 1))
+#+end_src
 ** Flycheck
 *** Always disable textlint
 #+begin_src emacs-lisp
