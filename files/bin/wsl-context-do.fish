@@ -39,7 +39,7 @@ end
 
 # Emacs should always use WSL environment. Unless `--win`
 # or `--noemacs` was used.
-if set -q EMACS and not set -q _flag_noemacs
+if [ "$EMACS" = "yes" ] and not set -q _flag_noemacs
     exec $wsl_cmd $argv
 end
 
