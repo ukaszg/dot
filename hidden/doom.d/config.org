@@ -267,6 +267,33 @@ This allows to run only wsl versions of wrapped commands.
 #+begin_src emacs-lisp
 (add-hook! 'after-init-hook (pinentry-start))
 #+end_src
+** Desktop
+:PROPERTIES:
+:CREATED:  [2023-01-25 18:29]
+:END:
+*** Save desktop state on exit
+:PROPERTIES:
+:CREATED:  [2023-01-25 18:29]
+:END:
+#+begin_src emacs-lisp
+(after! desktop
+  (setq! desktop-save t)
+  (add-hook! 'kill-emacs-hook #'desktop-save-in-desktop-dir))
+#+end_src
+*** Load desktop state on startup
+:PROPERTIES:
+:CREATED:  [2023-01-25 18:36]
+:END:
+#+begin_src emacs-lisp
+(add-hook! 'after-init-hook
+  (defun uki/desktop-auto-restore-h ()
+    "Restore desktop state."
+    (interactive)
+    (require 'desktop nil t)
+    (when (file-exists-p (desktop-full-file-name))
+      (desktop-read (desktop-full-file-name))
+      (delete-file (desktop-full-file-name) nil))))
+#+end_src
 * Major-modes
 ** Magit
 :PROPERTIES:
