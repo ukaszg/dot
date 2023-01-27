@@ -527,6 +527,8 @@ concrete file, ~+literate-enable-recompile-h~ might not recognize it as literate
 
 As a workaround I disable literate autotangle.
 #+begin_src emacs-lisp
+(setq! +literate-config-file (expand-file-name "~/src/dot/hidden/doom.d/config.org")
+       doom-user-dir         (expand-file-name "~/src/dot/hidden/doom.d/"))
 (after! org
   (remove-hook 'org-mode-hook #'+literate-enable-recompile-h))
 #+end_src
