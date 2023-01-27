@@ -2,7 +2,7 @@
 #+AUTHOR: Łukasz Gruner
 #+EMAIL: lukasz@gruner.lu
 #+DESCRIPTION: Doom Emacs literate config.
-#+TAGS: package(p) advice(a) disabled(d) hook(h) bind(b) setq(s) popup(u) hack(H)
+#+TAGS: package(p) advice(a) disabled(d) hook(h) bind(b) setq(s) popup(u) hack(H) defines(D) env(e)
 #+PROPERTY: header-args:emacs-lisp :tangle ~/.doom.d/config.el :tangle-mode (identity #o400) :results silent :exports code :lexical yes :mkdirp no
 #+TODO: TODO
 
@@ -28,13 +28,14 @@
 #+begin_src emacs-lisp
 (add-hook! 'kill-emacs-query-functions #'custom-save-all)
 #+end_src
-** Modules configuration (init.el)
+** =MODULES=
 #+begin_src emacs-lisp :tangle ~/.doom.d/init.el
 ;;; ~/.doom.d/init.el -*- lexical-binding: t; -*-
-(doom! :completion (company -tng) (vertico +icons)
-       :ui         doom hl-todo (modeline +light)
+(doom! :completion (company -tng -childframe) (vertico +icons)
+       :ui         doom doom-dashboard hl-todo (modeline +light)
                    nav-flash ophints (treemacs +lsp)
                    (popup +all +defaults) vc-gutter vi-tilde-fringe
+                   (window-select +numbers +switch-window)
        :editor     (evil +everywhere) file-templates fold
                    format snippets word-wrap
        :emacs      (dired +icons) electric (ibuffer +icons) undo vc
@@ -50,44 +51,42 @@
        :config     literate (default +bindings +smartparens))
 #+end_src
 ** My Library of useful stuff
-*** Locally remap q to exit buffer
+*** Locally remap q to exit buffer                                      :defines:
 Some modes don't require macros (like most RO buffers).
 #+begin_src emacs-lisp
 (defun uki/local-remap-q-kills-buffer-h ()
   (define-key evil-normal-state-local-map (kbd "q") #'quit-window)
   (define-key evil-visual-state-local-map (kbd "q") #'quit-window))
 #+end_src
-*** Simple-httpd                                                     :package:
+*** Install =simple-httpd=                                              :package:
 #+begin_src emacs-lisp :tangle ~/.doom.d/packages.el
 (package! simple-httpd)
 #+end_src
-*** Paste from WSL clipboard
+*** Paste from WSL clipboard                                            :defines:
 #+begin_src emacs-lisp
 (defun uki/wsl-paste ()
   "Paste using Windows' clipboard."
   (interactive)
   (save-excursion
-    (let ((text (shell-command-to-string "winclip.sh")))
-      ;; fix newlines
-      (setq text (replace-regexp-in-string "\r" "" text))
+    (let ((text (shell-command-to-string "powershell.exe -command 'Get-Clipboard' | dos2unix")))
       ;; powershell adds an extra newline
       (setq text (substring text 0 -1))
-      (insert text))))
+      (insert-for-yank text))))
 #+end_src
-*** Set `$EMACS` variable for wsl wrapper script
+*** Set `$EMACS` variable for wsl wrapper script                        :env:
 My script [[~/bin/wsl-context-do.fish]] expects EMACS env var to be present.
 This allows to run only wsl versions of wrapped commands.
 #+begin_src emacs-lisp
-(setenv "EMACS" "yes")
+(setenv "EMACS" "yes" t)
 #+end_src
-*** Enable-mode-hook
+*** Enable-mode-hook                                                    :defines:
 :PROPERTIES:
 :CREATED:  [2022-08-19 21:20]
 :END:
 #+begin_src emacs-lisp
 (defmacro uki/enable-mode-hook (mode)
   "Create function that enables `MODE' for use in hooks."
-  `(defun ,(make-symbol (concat "enable-mode--" (symbol-name mode) "--h")) ()
+  `(defun ,(make-symbol (concat "uki/enable-mode--" (symbol-name mode) "--h")) ()
        ,(format "Enables mode `%s'." mode)
        (,mode 1)))
 #+end_src
@@ -98,27 +97,27 @@ This allows to run only wsl versions of wrapped commands.
 (setq! user-full-name    "Łukasz Gruner"
        user-mail-address "lukasz@gruner.lu")
 #+end_src
-*** Set theme & font                                            :package:setq:
-~doom-zenburn-theme~ is installed by =:ui doom=
+*** Set theme & font                                                    :setq:
+~doom-zenburn-theme~ is installed by [[Modules configuration (init.el)][:ui doom]]
 #+begin_src emacs-lisp
-(setq! doom-theme               'doom-zenburn
-       doom-variable-pitch-font "DejaVu Sans:size=12:antialias=off"
-       doom-font                "Terminus:size=16:antialias=off"
-       doom-big-font            "Terminus:size=24:antialias=off")
+(let ((fn (cond
+           ((find-font (font-spec :name "Terminus (TTF)")) "Terminus (TTF)")
+           ((find-font (font-spec :name "Terminus")) "Terminus")
+           (t "Monospace"))))
+  (setq! doom-theme               'doom-zenburn
+         doom-variable-pitch-font "Noto Sans:size=10:antialias=off"
+         doom-font                (concat fn ":size=16:antialias=off")
+         doom-big-font            (concat fn ":size=24:antialias=off")))
 #+end_src
-*** Start maximized
+*** Start maximized                                                     :setq:
 #+begin_src emacs-lisp
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 #+end_src
-*** Define const vars                                                   :setq:
+*** Define const vars                                                   :defines:
 #+begin_src emacs-lisp
 (defconst uki/dotfiles-dir (expand-file-name "~/src/dot/") "Dotfiles repository root.")
 (defconst uki/ellipsis "…" "Ellipsis.")
-#+end_src
-*** If '.elc' file is outdated load an uncompiled '.el' file instead    :setq:
-#+begin_src emacs-lisp
-(setq! load-prefer-newer t)
 #+end_src
 *** Make scripts executable on save                                     :hook:
 #+begin_src emacs-lisp
@@ -130,21 +129,16 @@ This allows to run only wsl versions of wrapped commands.
 #+end_src
 *** Enable ~+global-word-wrap-mode~
 #+begin_src emacs-lisp
-(+global-word-wrap-mode +1)
+(add-hook! 'after-init-hook (uki/enable-mode-hook +global-word-wrap-mode))
 #+end_src
-*** Whitespace
+*** Whitespace                                                          :hook:setq:
 :PROPERTIES:
 :CREATED:  [2022-07-05 wto 06:18]
 :END:
-**** Highlight trailing whitespace                                     :hook:setq:
 #+begin_src emacs-lisp
 (setq-hook! '(prog-mode-hook org-mode-hook)
+  whitespace-style '(face trailing)
   show-trailing-whitespace t)
-#+end_src
-**** Only highlight trailing whitespace when coding                    :hook:setq:
-#+begin_src emacs-lisp
-(setq-hook! '(prog-mode-hook org-mode-hook)
-  whitespace-style '(face trailing))
 #+end_src
 *** Enable native compilation of packages
 :PROPERTIES:
@@ -153,12 +147,19 @@ This allows to run only wsl versions of wrapped commands.
 #+begin_src emacs-lisp
 (setq! package-native-compile t)
 #+end_src
+*** Start ~doom/open-scratch-buffer~ in last buffer's ~major-mode~
+:PROPERTIES:
+:CREATED:  [2023-01-27 17:20]
+:END:
+#+begin_src emacs-lisp
+(unless noninteractive
+  (setq! doom-scratch-initial-major-mode t))
+#+end_src
 ** Consult
 *** Buffer list filtering
 #+begin_src emacs-lisp
 (after! consult
   (setq! consult-buffer-filter `(,@consult-buffer-filter
-                                 "\\`\\*Compile\\-Log\\*\\'"
                                  "\\`\\*scratch\\*\\'"
                                  "\\`\\*Messages\\*\\'"
                                  "\\`\\*helpful .*\\*\\'")))
@@ -183,16 +184,16 @@ This allows to run only wsl versions of wrapped commands.
       "<up>"    #'evil-window-up
       "<down>"  #'evil-window-down)
 #+end_src
-*** Enable =vimish-fold-mode= globally
+*** Enable =vimish-fold-mode= globally                                  :hook:defines:
 :PROPERTIES:
 :CREATED:  [2023-01-20 16:33]
 :END:
 #+begin_src emacs-lisp
-(after! vimish-fold
-  (vimish-fold-global-mode 1))
+(add-hook! 'after-init-hook
+  (uki/enable-mode-hook vimish-fold-global-mode))
 #+end_src
 ** Flycheck
-*** Always disable textlint
+*** Always disable textlint                                             :hook:defines:
 #+begin_src emacs-lisp
 (after! flycheck
   (add-hook! '(org-mode-hook text-mode-hook prog-mode-hook)
@@ -201,7 +202,7 @@ This allows to run only wsl versions of wrapped commands.
       (cl-pushnew 'textlint flycheck-disabled-checkers))))
 #+end_src
 ** LSP
-*** Settings
+*** Settings                                                            :setq:
 #+begin_src emacs-lisp
 (after! lsp
   (require 'lsp-ui)
@@ -219,30 +220,37 @@ This allows to run only wsl versions of wrapped commands.
 :PROPERTIES:
 :CREATED:  [2022-08-19 20:57]
 :END:
-*** Sync with LSP workspace
+*** Sync with LSP workspace                                             :hook:defines:
 #+begin_src emacs-lisp
 (after! treemacs
   (add-hook! 'treemacs-mode-hook
     (uki/enable-mode-hook lsp-treemacs-sync-mode)))
 #+end_src
-*** Enable follow mode
+*** Enable follow mode                                                  :hook:defines:
 #+begin_src emacs-lisp
 (after! treemacs
   (add-hook! 'treemacs-mode-hook
     (uki/enable-mode-hook treemacs-follow-mode)))
 #+end_src
+*** Git mode extended
+:PROPERTIES:
+:CREATED:  [2023-01-27 18:59]
+:END:
+#+begin_src emacs-lisp
+(setq! +treemacs-git-mode 'deferred)
+#+end_src
 ** Keychain
 :PROPERTIES:
 :CREATED:  [2022-08-22 11:14]
 :END:
-*** Package
+*** Package                                                             :package:
 :PROPERTIES:
 :CREATED:  [2022-08-22 11:14]
 :END:
 #+begin_src emacs-lisp :tangle ~/.doom.d/packages.el
 (package! keychain-environment)
 #+end_src
-*** Autostart
+*** Autostart                                                           :hook:
 :PROPERTIES:
 :CREATED:  [2022-08-22 11:17]
 :END:
@@ -253,7 +261,7 @@ This allows to run only wsl versions of wrapped commands.
 :PROPERTIES:
 :CREATED:  [2022-08-22 11:31]
 :END:
-*** Install
+*** Package                                                             :package:
 :PROPERTIES:
 :CREATED:  [2022-08-22 11:31]
 :END:
@@ -265,34 +273,15 @@ This allows to run only wsl versions of wrapped commands.
 :CREATED:  [2022-08-22 11:40]
 :END:
 #+begin_src emacs-lisp
-(add-hook! 'after-init-hook (pinentry-start))
+(add-hook! 'after-init-hook #'pinentry-start)
 #+end_src
 ** Desktop
 :PROPERTIES:
 :CREATED:  [2023-01-25 18:29]
 :END:
-*** Save desktop state on exit
-:PROPERTIES:
-:CREATED:  [2023-01-25 18:29]
-:END:
-#+begin_src emacs-lisp
-(after! desktop
-  (setq! desktop-save t)
-  (add-hook! 'kill-emacs-hook #'desktop-save-in-desktop-dir))
-#+end_src
-*** Load desktop state on startup
-:PROPERTIES:
-:CREATED:  [2023-01-25 18:36]
-:END:
 #+begin_src emacs-lisp
 (add-hook! 'after-init-hook
-  (defun uki/desktop-auto-restore-h ()
-    "Restore desktop state."
-    (interactive)
-    (require 'desktop nil t)
-    (when (file-exists-p (desktop-full-file-name))
-      (desktop-read (desktop-full-file-name))
-      (delete-file (desktop-full-file-name) nil))))
+  (uki/enable-mode-hook desktop-save-mode))
 #+end_src
 * Major-modes
 ** Magit
