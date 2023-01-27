@@ -123,6 +123,10 @@ This allows to run only wsl versions of wrapped commands.
 #+begin_src emacs-lisp
 (add-hook! 'after-save-hook #'executable-make-buffer-file-executable-if-script-p)
 #+end_src
+*** Enable gpg-sign for git commits                                     :setq:
+#+begin_src emacs-lisp
+(setq! epg-pinentry-mode 'loopback)
+#+end_src
 *** *<mouse-1>* should follow links                                     :setq:
 #+begin_src emacs-lisp
 (setq! mouse-1-click-follows-link t)
@@ -162,7 +166,7 @@ This allows to run only wsl versions of wrapped commands.
   (setq! consult-buffer-filter `(,@consult-buffer-filter
                                  "\\`\\*scratch\\*\\'"
                                  "\\`\\*Messages\\*\\'"
-                                 "\\`\\*helpful .*\\*\\'")))
+                                 "\\`\\*helpful.*\\*\\'")))
 #+end_src
 ** Hl-Todo
 *** Highlight background                                                :setq:
@@ -283,6 +287,15 @@ This allows to run only wsl versions of wrapped commands.
 (add-hook! 'after-init-hook
   (uki/enable-mode-hook desktop-save-mode))
 #+end_src
+** Display line numbers
+:PROPERTIES:
+:CREATED:  [2023-01-25 21:07]
+:END:
+But only in prog & conf mode.
+#+begin_src emacs-lisp
+(after! display-line-numbers
+  (remove-hook! 'text-mode-hook #'display-line-numbers-mode))
+#+end_src
 * Major-modes
 ** Magit
 :PROPERTIES:
@@ -335,6 +348,7 @@ Messages buffer already exists so hook won't get called until it gets restarted.
       [remap dired-up-directory] #'uki/dired-up-directory)
 #+end_src
 *** Permanent ~dired-hide-details-mode~                                 :bind:
+press <space m d> to toggle
 #+begin_src emacs-lisp
 (defun uki/permanent-dired-hide-details-mode-set (sym exp)
   "Restore saved mode state or set a new value."
@@ -358,7 +372,7 @@ Messages buffer already exists so hook won't get called until it gets restarted.
    (not uki/permanent-dired-hide-details-mode-state)))
 
 (map! :after dired :map dired-mode-map
-      (:localleader :desc "Hide-Details" "d" #'uki/permanent-dired-hide-details-mode-toggle)
+      (:localleader :desc "dired-hide-details (toggle)" "d" #'uki/permanent-dired-hide-details-mode-toggle)
       ([remap dired-hide-details-mode] #'uki/permanent-dired-hide-details-mode-toggle))
 #+end_src
 *** Run dired instead of listing directory
@@ -520,6 +534,31 @@ If the property already exists, it will not be modified."
 *** Have <q> exit window                                           :hook:bind:
 #+begin_src emacs-lisp
 (add-hook! 'comint-mode-hook #'uki/local-remap-q-kills-buffer-h)
+#+end_src
+** Powershell
+:PROPERTIES:
+:CREATED:  [2023-01-25 19:45]
+:END:
+*** TODO Set exe location
+TODO: fix: M-x lsp-install-server
+:PROPERTIES:
+:CREATED:  [2023-01-25 19:45]
+:END:
+#+begin_src emacs-lisp
+(after! lsp-pwsh
+  (setq! lsp-pwsh-exe (executable-find "powershell.exe")))
+#+end_src
+** Vterm
+:PROPERTIES:
+:CREATED:  [2023-01-25 20:39]
+:END:
+*** Disable solaire mode
+When enabled, vterm background is too dark to see dark-blue (filename) color.
+:PROPERTIES:
+:CREATED:  [2023-01-25 20:39]
+:END:
+#+begin_src emacs-lisp
+(add-hook! 'vterm-mode-hook #'turn-off-solaire-mode)
 #+end_src
 * Auto tangle & compile
 My =~/.doom.d/config.org= is a softlink, so depending on if I open a symlink or
