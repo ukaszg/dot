@@ -279,13 +279,12 @@ This allows to run only wsl versions of wrapped commands.
 #+begin_src emacs-lisp
 (add-hook! 'after-init-hook #'pinentry-start)
 #+end_src
-** Desktop
+** Save desktop automatically
 :PROPERTIES:
 :CREATED:  [2023-01-25 18:29]
 :END:
 #+begin_src emacs-lisp
-(add-hook! 'after-init-hook
-  (uki/enable-mode-hook desktop-save-mode))
+(add-hook! 'kill-emacs-hook #'desktop-save-in-desktop-dir)
 #+end_src
 ** Display line numbers
 :PROPERTIES:
