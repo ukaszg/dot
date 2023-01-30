@@ -3,7 +3,7 @@
 #+EMAIL: lukasz@gruner.lu
 #+DESCRIPTION: Doom Emacs literate config.
 #+TAGS: package(p) advice(a) disabled(d) hook(h) bind(b) setq(s) popup(u) hack(H) defines(D) env(e)
-#+PROPERTY: header-args:emacs-lisp :tangle ~/.doom.d/config.el :tangle-mode (identity #o400) :results silent :exports code :lexical yes :mkdirp no
+#+PROPERTY: header-args:emacs-lisp :tangle ~/.doom.d/config.el :tangle-mode (identity #o400) :results silent :exports code :lexical yes
 #+TODO: TODO
 
 * =*DOOM*=
@@ -28,7 +28,7 @@
 #+begin_src emacs-lisp
 (add-hook! 'kill-emacs-query-functions #'custom-save-all)
 #+end_src
-** =MODULES=
+** My =MODULES= (init.el)
 #+begin_src emacs-lisp :tangle ~/.doom.d/init.el
 ;;; ~/.doom.d/init.el -*- lexical-binding: t; -*-
 (doom! :completion (company -tng -childframe) (vertico +icons)
@@ -46,15 +46,16 @@
        :os         tty
        :lang       (cc +lsp) data emacs-lisp (go +lsp)
                    (java +lsp) (javascript +lsp) (json -lsp)
-                   lua markdown (org +hugo) (python +lsp) rest
+                   lua markdown (org +hugo) (python +lsp)
                    (sh +fish -lsp) (web +lsp) (yaml -lsp)
        :config     literate (default +bindings +smartparens))
 #+end_src
 ** My Library of useful stuff
-*** Locally remap q to exit buffer                                      :defines:
+*** ~uki/local-remap-q-kills-buffer-h~                                  :defines:
 Some modes don't require macros (like most RO buffers).
 #+begin_src emacs-lisp
 (defun uki/local-remap-q-kills-buffer-h ()
+  "Locally remap <q> to `quit-window'."
   (define-key evil-normal-state-local-map (kbd "q") #'quit-window)
   (define-key evil-visual-state-local-map (kbd "q") #'quit-window))
 #+end_src
@@ -62,7 +63,7 @@ Some modes don't require macros (like most RO buffers).
 #+begin_src emacs-lisp :tangle ~/.doom.d/packages.el
 (package! simple-httpd)
 #+end_src
-*** Paste from WSL clipboard                                            :defines:
+*** ~uki/wsl-paste~                                                     :defines:
 #+begin_src emacs-lisp
 (defun uki/wsl-paste ()
   "Paste using Windows' clipboard."
@@ -79,7 +80,7 @@ This allows to run only wsl versions of wrapped commands.
 #+begin_src emacs-lisp
 (setenv "EMACS" "yes" t)
 #+end_src
-*** Enable-mode-hook                                                    :defines:
+*** ~uki/enable-mode-hook~                                              :defines:
 :PROPERTIES:
 :CREATED:  [2022-08-19 21:20]
 :END:
@@ -91,14 +92,14 @@ This allows to run only wsl versions of wrapped commands.
        (,mode 1)))
 #+end_src
 * Minor-modes
-** =Builtin= and one-liners
+** Builtin, doom and one-liners
 *** Personal info                                                       :setq:
 #+begin_src emacs-lisp
 (setq! user-full-name    "Łukasz Gruner"
        user-mail-address "lukasz@gruner.lu")
 #+end_src
 *** Set theme & font                                                    :setq:
-~doom-zenburn-theme~ is installed by [[Modules configuration (init.el)][:ui doom]]
+~doom-zenburn-theme~ is installed by [[My =MODULES= (init.el)][=:ui doom=]]
 #+begin_src emacs-lisp
 (let ((fn (cond
            ((find-font (font-spec :name "Terminus (TTF)")) "Terminus (TTF)")
@@ -122,10 +123,6 @@ This allows to run only wsl versions of wrapped commands.
 *** Make scripts executable on save                                     :hook:
 #+begin_src emacs-lisp
 (add-hook! 'after-save-hook #'executable-make-buffer-file-executable-if-script-p)
-#+end_src
-*** Enable gpg-sign for git commits                                     :setq:
-#+begin_src emacs-lisp
-(setq! epg-pinentry-mode 'loopback)
 #+end_src
 *** *<mouse-1>* should follow links                                     :setq:
 #+begin_src emacs-lisp
@@ -278,15 +275,21 @@ This allows to run only wsl versions of wrapped commands.
 :END:
 #+begin_src emacs-lisp
 (add-hook! 'after-init-hook #'pinentry-start)
+(add-hook! 'kill-emacs-hook #'pinentry-stop)
 #+end_src
-** Save desktop automatically
+*** Enable gpg-sign for git commits                                     :setq:
+#+begin_src emacs-lisp
+(after! epg
+  (setq! epg-pinentry-mode 'loopback))
+#+end_src
+** Desktop-Save
 :PROPERTIES:
 :CREATED:  [2023-01-25 18:29]
 :END:
 #+begin_src emacs-lisp
 (add-hook! 'kill-emacs-hook #'desktop-save-in-desktop-dir)
 #+end_src
-** Display line numbers
+** Display-Line-Numbers
 :PROPERTIES:
 :CREATED:  [2023-01-25 21:07]
 :END:
@@ -489,7 +492,7 @@ If the property already exists, it will not be modified."
 *** Use long lines                                                      :hook:setq:
 #+begin_src emacs-lisp
 (setq-hook! 'java-mode-hook
-  fill-column 160)
+  fill-column 180)
 #+end_src
 *** Load formatter configuration if present
 #+begin_src emacs-lisp
@@ -501,12 +504,7 @@ If the property already exists, it will not be modified."
                lsp-java-format-settings-url formatter)
       (message "No formatter file present: %s" formatter))))
 #+end_src
-*** Always use code blocks
-#+begin_src emacs-lisp
-(after! lsp-java
-  (setq! lsp-java-code-generation-use-blocks t))
-#+end_src
-*** Settings
+*** LSP Settings                                                        :setq:
 :PROPERTIES:
 :CREATED:  [2022-08-19 20:19]
 :END:
@@ -516,7 +514,8 @@ If the property already exists, it will not be modified."
          lsp-java-dependency-package-representation "hierarchical"
          lsp-java-maven-download-sources t
          lsp-java-references-code-lens-enabled t
-         lsp-java-configuration-maven-user-settings (expand-file-name "~/.m2/settings.xml")
+         lsp-java-configuration-maven-user-settings (file-truename "~/.m2/settings.xml")
+         lsp-java-code-generation-use-blocks t
          lsp-java-save-actions-organize-imports t))
 #+end_src
 ** Compilation
@@ -538,7 +537,7 @@ If the property already exists, it will not be modified."
 :PROPERTIES:
 :CREATED:  [2023-01-25 19:45]
 :END:
-*** TODO Set exe location
+*** Set lsp exe location                                                :setq:
 TODO: fix: M-x lsp-install-server
 :PROPERTIES:
 :CREATED:  [2023-01-25 19:45]
@@ -551,7 +550,7 @@ TODO: fix: M-x lsp-install-server
 :PROPERTIES:
 :CREATED:  [2023-01-25 20:39]
 :END:
-*** Disable solaire mode
+*** Disable solaire mode                                                :hook:
 When enabled, vterm background is too dark to see dark-blue (filename) color.
 :PROPERTIES:
 :CREATED:  [2023-01-25 20:39]
@@ -565,8 +564,6 @@ concrete file, ~+literate-enable-recompile-h~ might not recognize it as literate
 
 As a workaround I disable literate autotangle.
 #+begin_src emacs-lisp
-(setq! +literate-config-file (expand-file-name "~/src/dot/hidden/doom.d/config.org")
-       doom-user-dir         (expand-file-name "~/src/dot/hidden/doom.d/"))
 (after! org
   (remove-hook 'org-mode-hook #'+literate-enable-recompile-h))
 #+end_src
