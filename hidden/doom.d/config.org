@@ -123,6 +123,10 @@ This allows to run only wsl versions of wrapped commands.
 #+begin_src emacs-lisp
 (add-hook! 'after-save-hook #'executable-make-buffer-file-executable-if-script-p)
 #+end_src
+*** Enable gpg-sign for git commits                                     :setq:
+#+begin_src emacs-lisp
+(setq! epg-pinentry-mode 'loopback)
+#+end_src
 *** *<mouse-1>* should follow links                                     :setq:
 #+begin_src emacs-lisp
 (setq! mouse-1-click-follows-link t)
