@@ -287,6 +287,15 @@ This allows to run only wsl versions of wrapped commands.
 (add-hook! 'after-init-hook
   (uki/enable-mode-hook desktop-save-mode))
 #+end_src
+** Display line numbers
+:PROPERTIES:
+:CREATED:  [2023-01-25 21:07]
+:END:
+But only in prog & conf mode.
+#+begin_src emacs-lisp
+(after! display-line-numbers
+  (remove-hook! 'text-mode-hook #'display-line-numbers-mode))
+#+end_src
 * Major-modes
 ** Magit
 :PROPERTIES:
