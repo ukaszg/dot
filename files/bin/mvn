@@ -1,3 +1,0 @@
-#!/bin/sh
-
-exec wsl-context-do.fish mvn.cmd /usr/bin/mvn --cmd "$@"

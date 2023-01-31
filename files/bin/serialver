@@ -1,2 +1,0 @@
-#!/bin/sh
-exec wsl-context-do.fish servialver.exe /usr/bin/servialver "$@"

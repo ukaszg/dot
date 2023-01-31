@@ -48,3 +48,5 @@
     recurse = true
 [include]
     path = ~/.gitconfig.local
+[safe]
+	directory = *

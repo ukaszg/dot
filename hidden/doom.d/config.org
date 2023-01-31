@@ -78,7 +78,7 @@ Some modes don't require macros (like most RO buffers).
 My script [[~/bin/wsl-context-do.fish]] expects EMACS env var to be present.
 This allows to run only wsl versions of wrapped commands.
 #+begin_src emacs-lisp
-(setenv "EMACS" "yes" t)
+(setenv "EMACS" "yes")
 #+end_src
 *** ~uki/enable-mode-hook~                                              :defines:
 :PROPERTIES:
@@ -310,6 +310,14 @@ But only in prog & conf mode.
 #+begin_src emacs-lisp
 (after! magit
   (setq magit-revision-show-gravatars '("^Author:     " . "^Commit:     ")))
+#+end_src
+*** Always use git wrapper
+:PROPERTIES:
+:CREATED:  [2023-01-31 13:26]
+:END:
+#+begin_src emacs-lisp
+(after! magit
+  (setq! magit-git-executable (expand-file-name "files/bin/git" uki/dotfiles-dir)))
 #+end_src
 ** Messages
 *** <q> emacs-buffer/window                                             :hook:

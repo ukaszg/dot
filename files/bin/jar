@@ -1,2 +1,0 @@
-#!/bin/sh
-exec wsl-context-do.fish jar.exe /usr/bin/jar "$@"

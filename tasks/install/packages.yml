@@ -37,7 +37,7 @@
           - cargo
           - ccls
           - clang-format
-          - conky-cli
+          - clangd
           - containerd.io
           - cmake
           - curl

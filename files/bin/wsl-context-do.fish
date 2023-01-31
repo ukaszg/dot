@@ -5,7 +5,6 @@
 #
 ### OPTIONS: these go 1st, multiple are allowed.
 # - `--cmd` wrap Windows command in a call to `cmd.exe`.
-# - `--noemacs` run as if not invoked by Emacs.
 # - `--wsl` will force usage of WSL command.
 # - `--win` will force usage of Windows command.
 ######################
@@ -15,7 +14,7 @@ set -l wsl_cmd $argv[2]
 set -l argv $argv[3..-1]
 
 ## Options:
-set -l options -x 'wsl,win' 'C-cmd' 'L-wsl' 'W-win' 'E-noemacs'
+set -l options -x 'wsl,win' 'C-cmd' 'L-wsl' 'W-win'
 argparse -i -n wsl-context-do.fish $options -- $argv
 
 # Force WSL.
@@ -35,12 +34,6 @@ end
 # Force Windows.
 if set -q _flag_win
     exec $win_cmd $argv
-end
-
-# Emacs should always use WSL environment. Unless `--win`
-# or `--noemacs` was used.
-if [ "$EMACS" = "yes" ] and not set -q _flag_noemacs
-    exec $wsl_cmd $argv
 end
 
 # Run command depending on current dir.

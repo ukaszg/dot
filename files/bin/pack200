@@ -1,2 +1,0 @@
-#!/bin/sh
-exec wsl-context-do.fish pack200.exe /usr/bin/pack200 "$@"
