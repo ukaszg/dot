@@ -282,13 +282,6 @@ This allows to run only wsl versions of wrapped commands.
 (after! epg
   (setq! epg-pinentry-mode 'loopback))
 #+end_src
-** Desktop-Save
-:PROPERTIES:
-:CREATED:  [2023-01-25 18:29]
-:END:
-#+begin_src emacs-lisp
-(add-hook! 'kill-emacs-hook #'desktop-save-in-desktop-dir)
-#+end_src
 ** Display-Line-Numbers
 :PROPERTIES:
 :CREATED:  [2023-01-25 21:07]
