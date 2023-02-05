@@ -518,7 +518,7 @@ If the property already exists, it will not be modified."
   (let ((formatter (expand-file-name "~/.formatter.xml")))
     (if (file-exists-p formatter)
         (setq! lsp-java-format-enabled t
-               lsp-java-format-settings-profile "default"
+               lsp-java-format-settings-profile "EKT_Java_Formatter_2"
                lsp-java-format-settings-url formatter)
       (message "No formatter file present: %s" formatter))))
 #+end_src
@@ -528,7 +528,7 @@ If the property already exists, it will not be modified."
 :END:
 #+begin_src emacs-lisp
 (after! lsp-java
-  (setq! lsp-java-java-path "/usr/bin/java"
+  (setq! lsp-java-java-path (file-truename "/usr/lib/jvm/java-11-openjdk-amd64/bin/java")
          lsp-java-dependency-package-representation "hierarchical"
          lsp-java-maven-download-sources t
          lsp-java-references-code-lens-enabled t
