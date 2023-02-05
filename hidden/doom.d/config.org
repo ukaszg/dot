@@ -327,7 +327,7 @@ But only in prog & conf mode.
 :END:
 #+begin_src emacs-lisp
 (after! magit
-  (setq! magit-git-executable (expand-file-name "files/bin/git" uki/dotfiles-dir)))
+  (setq! magit-git-executable (expand-file-name "/usr/bin/git")))
 #+end_src
 ** Messages
 *** <q> emacs-buffer/window                                             :hook:
