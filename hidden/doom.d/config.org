@@ -117,6 +117,7 @@ This allows to run only wsl versions of wrapped commands.
 #+end_src
 *** Define const vars                                                   :defines:
 #+begin_src emacs-lisp
+(defgroup uki nil "Group for my things." :group 'users)
 (defconst uki/dotfiles-dir (expand-file-name "~/src/dot/") "Dotfiles repository root.")
 (defconst uki/ellipsis "…" "Ellipsis.")
 #+end_src
@@ -291,6 +292,22 @@ But only in prog & conf mode.
 (after! display-line-numbers
   (remove-hook! 'text-mode-hook #'display-line-numbers-mode))
 #+end_src
+** Eldoc
+:PROPERTIES:
+:CREATED:  [2023-02-05 00:16]
+:END:
+*** TODO Lsp co-op
+:PROPERTIES:
+:CREATED:  [2023-02-05 00:16]
+:END:
+#+begin_src emacs-lisp
+(defun uki/enable-eldoc-for-lsp-h ()
+    "Configure and enable `eldoc-mode' using `lsp-mode' features."
+    (interactive)
+    (require 'eldoc nil t)
+    (add-function :before-until (local 'eldoc-documentation-function) #'lsp-eldoc-function)
+    (eldoc-mode 1))
+#+end_src
 * Major-modes
 ** Magit
 :PROPERTIES:
@@ -363,7 +380,7 @@ press <space m d> to toggle
 
 (defcustom uki/permanent-dired-hide-details-mode-state nil
   "State of `dired-hide-details-mode' saved between restarts."
-  :group 'user
+  :group 'uki
   :type 'bool
   :initialize #'uki/permanent-dired-hide-details-mode-set)
 
@@ -518,6 +535,21 @@ If the property already exists, it will not be modified."
          lsp-java-configuration-maven-user-settings (file-truename "~/.m2/settings.xml")
          lsp-java-code-generation-use-blocks t
          lsp-java-save-actions-organize-imports t))
+#+end_src
+*** Enable eldoc
+:PROPERTIES:
+:CREATED:  [2023-02-04 23:45]
+:END:
+#+begin_src emacs-lisp
+(add-hook! 'java-mode-hook #'uki/enable-eldoc-for-lsp-h)
+#+end_src
+*** Tab width
+:PROPERTIES:
+:CREATED:  [2023-02-05 02:33]
+:END:
+#+begin_src emacs-lisp
+(setq-hook! 'java-mode-hook
+  tab-width 4)
 #+end_src
 ** Compilation
 *** Have <q> exit window                                           :hook:bind:
