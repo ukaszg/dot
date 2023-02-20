@@ -4,7 +4,7 @@
 # exec wsl-context-do.fish $cmd.exe /usr/bin/$cmd [OPTIONS [OPTIONS...]] "$@"
 #
 ### OPTIONS: these go 1st, multiple are allowed.
-# - `--cmd` wrap Windows command in a call to `cmd.exe`.
+# - `--cmd` wrap Windows command in a call to `powershell.exe`.
 # - `--wsl` will force usage of WSL command.
 # - `--win` will force usage of Windows command.
 ######################
@@ -22,13 +22,9 @@ if set -q _flag_wsl
     exec $wsl_cmd $argv
 end
 
-# Wrap Windows command in call to `cmd.exe`.
+# Wrap Windows command in call to `powershell.exe`.
 if set -q _flag_cmd
-    if [ (string sub -l 1 $win_cmd) != '/' ]
-        # always use executable with absolute path.
-        set win_cmd (command -v $win_cmd)
-    end
-    set win_cmd cmd.exe $win_cmd
+    set win_cmd powershell.exe (wslpath -w $win_cmd)
 end
 
 # Force Windows.

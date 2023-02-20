@@ -2,9 +2,10 @@
 #+AUTHOR: Łukasz Gruner
 #+EMAIL: lukasz@gruner.lu
 #+DESCRIPTION: Doom Emacs literate config.
-#+TAGS: package(p) advice(a) disabled(d) hook(h) bind(b) setq(s) popup(u) hack(H) defines(D) env(e)
+#+TAGS: package(p) advice(a) disabled(d) hook(h) bind(b) setq(s) popup(u) hack(H) defines(D) env(e) command(c)
 #+PROPERTY: header-args:emacs-lisp :tangle ~/.doom.d/config.el :tangle-mode (identity #o400) :results silent :exports code :lexical yes
 #+TODO: TODO
+#+startup: indent fold
 
 * =*DOOM*=
 ** Add file headers
@@ -16,25 +17,20 @@
 #+begin_src emacs-lisp :tangle ~/.doom.d/packages.el
 ;;; ~/.doom.d/packages.el -*- no-byte-compile: t; lexical-binding: t; -*-
 #+end_src
-*** load or create =custom.el=                                          :setq:
+*** and =custom.el=                                                     :setq:
 #+begin_src emacs-lisp
-(setq! custom-file (expand-file-name "custom.el" doom-user-dir))
-(if (file-exists-p custom-file)
-    (load custom-file)
+(setq! custom-file (concat doom-user-dir "custom.el"))
+(unless (file-exists-p custom-file)
   (with-temp-file custom-file
     (insert ";;; ~/.doom.d/custom.el -*- no-byte-compile: t; lexical-binding: t; -*-\n")))
 #+end_src
-*** ask about unsaved customizations
-#+begin_src emacs-lisp
-(add-hook! 'kill-emacs-query-functions #'custom-save-all)
-#+end_src
-** My =MODULES= (init.el)
+** =MODULES=
 #+begin_src emacs-lisp :tangle ~/.doom.d/init.el
-;;; ~/.doom.d/init.el -*- lexical-binding: t; -*-
+;;; ~/.doom.d/init.el -*- no-byte-compile: t; lexical-binding: t; -*-
 (doom! :completion (company -tng -childframe) (vertico +icons)
-       :ui         doom doom-dashboard hl-todo (modeline +light)
-                   nav-flash ophints (treemacs +lsp)
-                   (popup +all +defaults) vc-gutter vi-tilde-fringe
+       :ui         doom hl-todo (modeline +light)
+                   nav-flash ophints (treemacs +lsp) unicode
+                   (popup +all +defaults) (vc-gutter +pretty) vi-tilde-fringe
                    (window-select +numbers +switch-window)
        :editor     (evil +everywhere) file-templates fold
                    format snippets word-wrap
@@ -42,15 +38,17 @@
        :term       vterm
        :checkers   syntax
        :tools      (ansible +lsp) (debugger +lsp) (docker +lsp)
-                   (eval +overlay) lookup (lsp +peek) magit make
+                   editorconfig (eval +overlay)
+                   lookup (lsp +peek) magit make
+                   taskrunner terraform tree-sitter
        :os         tty
        :lang       (cc +lsp) data emacs-lisp (go +lsp)
                    (java +lsp) (javascript +lsp) (json -lsp)
-                   lua markdown (org +hugo) (python +lsp)
+                   lua markdown (org +hugo) (python +lsp) rest
                    (sh +fish -lsp) (web +lsp) (yaml -lsp)
        :config     literate (default +bindings +smartparens))
 #+end_src
-** My Library of useful stuff
+** My Library of useful things
 *** ~uki/local-remap-q-kills-buffer-h~                                  :defines:
 Some modes don't require macros (like most RO buffers).
 #+begin_src emacs-lisp
@@ -58,10 +56,6 @@ Some modes don't require macros (like most RO buffers).
   "Locally remap <q> to `quit-window'."
   (define-key evil-normal-state-local-map (kbd "q") #'quit-window)
   (define-key evil-visual-state-local-map (kbd "q") #'quit-window))
-#+end_src
-*** Install =simple-httpd=                                              :package:
-#+begin_src emacs-lisp :tangle ~/.doom.d/packages.el
-(package! simple-httpd)
 #+end_src
 *** ~uki/wsl-paste~                                                     :defines:
 #+begin_src emacs-lisp
@@ -73,23 +67,6 @@ Some modes don't require macros (like most RO buffers).
       ;; powershell adds an extra newline
       (setq text (substring text 0 -1))
       (insert-for-yank text))))
-#+end_src
-*** Set `$EMACS` variable for wsl wrapper script                        :env:
-My script [[~/bin/wsl-context-do.fish]] expects EMACS env var to be present.
-This allows to run only wsl versions of wrapped commands.
-#+begin_src emacs-lisp
-(setenv "EMACS" "yes")
-#+end_src
-*** ~uki/enable-mode-hook~                                              :defines:
-:PROPERTIES:
-:CREATED:  [2022-08-19 21:20]
-:END:
-#+begin_src emacs-lisp
-(defmacro uki/enable-mode-hook (mode)
-  "Create function that enables `MODE' for use in hooks."
-  `(defun ,(make-symbol (concat "uki/enable-mode--" (symbol-name mode) "--h")) ()
-       ,(format "Enables mode `%s'." mode)
-       (,mode 1)))
 #+end_src
 * Minor-modes
 ** Builtin, doom and one-liners
@@ -117,7 +94,7 @@ This allows to run only wsl versions of wrapped commands.
 #+end_src
 *** Define const vars                                                   :defines:
 #+begin_src emacs-lisp
-(defgroup uki nil "Group for my things." :group 'users)
+(defgroup uki nil "Group for my things." :group 'users :prefix "uki/")
 (defconst uki/dotfiles-dir (expand-file-name "~/src/dot/") "Dotfiles repository root.")
 (defconst uki/ellipsis "…" "Ellipsis.")
 #+end_src
@@ -131,28 +108,19 @@ This allows to run only wsl versions of wrapped commands.
 #+end_src
 *** Enable ~+global-word-wrap-mode~
 #+begin_src emacs-lisp
-(add-hook! 'after-init-hook (uki/enable-mode-hook +global-word-wrap-mode))
+(+global-word-wrap-mode 1)
 #+end_src
 *** Whitespace                                                          :hook:setq:
-:PROPERTIES:
-:CREATED:  [2022-07-05 wto 06:18]
-:END:
 #+begin_src emacs-lisp
 (setq-hook! '(prog-mode-hook org-mode-hook)
   whitespace-style '(face trailing)
   show-trailing-whitespace t)
 #+end_src
 *** Enable native compilation of packages
-:PROPERTIES:
-:CREATED:  [2023-01-25 00:28]
-:END:
 #+begin_src emacs-lisp
 (setq! package-native-compile t)
 #+end_src
 *** Start ~doom/open-scratch-buffer~ in last buffer's ~major-mode~
-:PROPERTIES:
-:CREATED:  [2023-01-27 17:20]
-:END:
 #+begin_src emacs-lisp
 (unless noninteractive
   (setq! doom-scratch-initial-major-mode t))
@@ -161,10 +129,20 @@ This allows to run only wsl versions of wrapped commands.
 *** Buffer list filtering
 #+begin_src emacs-lisp
 (after! consult
-  (setq! consult-buffer-filter `(,@consult-buffer-filter
-                                 "\\`\\*scratch\\*\\'"
-                                 "\\`\\*Messages\\*\\'"
-                                 "\\`\\*helpful.*\\*\\'")))
+  (setq! consult-buffer-filter
+         `(,@consult-buffer-filter
+           "\\`\\*scratch\\*\\'"
+           "\\`\\*Messages\\*\\'"
+           "\\`\\*helpful"
+           "\\`\\*doom\\*\\'"
+           "\\`\\*\\(?:eslint\\)\\(?:::stderr\\)?\\*\\'"
+           "\\`\\*\\(?:emmet-\\|html-\\|css-\\|xml\\)\\ls\\(?:::stderr\\)?\\*\\'"
+           "\\`magit")))
+#+end_src
+*** Next/prev buffer switching will skip visible buffers
+#+begin_src emacs-lisp
+(after! window
+  (setq! switch-to-prev-buffer-skip t))
 #+end_src
 ** Hl-Todo
 *** Highlight background                                                :setq:
@@ -192,7 +170,8 @@ This allows to run only wsl versions of wrapped commands.
 :END:
 #+begin_src emacs-lisp
 (add-hook! 'after-init-hook
-  (uki/enable-mode-hook vimish-fold-global-mode))
+  (defun uki/enable-vimish-fold-mode-h ()
+    (global-evil-vimish-fold-mode 1)))
 #+end_src
 ** Flycheck
 *** Always disable textlint                                             :hook:defines:
@@ -225,14 +204,12 @@ This allows to run only wsl versions of wrapped commands.
 *** Sync with LSP workspace                                             :hook:defines:
 #+begin_src emacs-lisp
 (after! treemacs
-  (add-hook! 'treemacs-mode-hook
-    (uki/enable-mode-hook lsp-treemacs-sync-mode)))
+    (lsp-treemacs-sync-mode 1))
 #+end_src
-*** Enable follow mode                                                  :hook:defines:
+*** Highlight current file
 #+begin_src emacs-lisp
 (after! treemacs
-  (add-hook! 'treemacs-mode-hook
-    (uki/enable-mode-hook treemacs-follow-mode)))
+  (treemacs-follow-mode 1))
 #+end_src
 *** Git mode extended
 :PROPERTIES:
@@ -293,41 +270,34 @@ But only in prog & conf mode.
   (remove-hook! 'text-mode-hook #'display-line-numbers-mode))
 #+end_src
 ** Eldoc
-:PROPERTIES:
-:CREATED:  [2023-02-05 00:16]
-:END:
 *** TODO Lsp co-op
-:PROPERTIES:
-:CREATED:  [2023-02-05 00:16]
-:END:
 #+begin_src emacs-lisp
 (defun uki/enable-eldoc-for-lsp-h ()
     "Configure and enable `eldoc-mode' using `lsp-mode' features."
     (interactive)
     (require 'eldoc nil t)
-    (add-function :before-until (local 'eldoc-documentation-function) #'lsp-eldoc-function)
+    (add-hook! 'eldoc-documentation-functions :local #'lsp-eldoc-function)
     (eldoc-mode 1))
+#+end_src
+** Desktop-save
+#+begin_src emacs-lisp
+(add-hook! 'after-init-hook
+  (defun uki/enable-desktop-save-mode-h (&rest _)
+    (desktop-save-mode 1)))
 #+end_src
 * Major-modes
 ** Magit
-:PROPERTIES:
-:CREATED:  [2023-01-04 09:16]
-:END:
-*** Enable Gravatars
-:PROPERTIES:
-:CREATED:  [2023-01-04 09:16]
-:END:
+*** Never use git wrapper                                               :setq:
 #+begin_src emacs-lisp
 (after! magit
-  (setq magit-revision-show-gravatars '("^Author:     " . "^Commit:     ")))
+  (setq! magit-git-executable (file-truename "/usr/bin/git")))
 #+end_src
-*** Always use git wrapper
-:PROPERTIES:
-:CREATED:  [2023-01-31 13:26]
-:END:
-#+begin_src emacs-lisp
-(after! magit
-  (setq! magit-git-executable (expand-file-name "/usr/bin/git")))
+*** Hide magit buffers from lists                                       :setq:
+#+begin_src emacs-lisp :tangle no
+(after! magit-mode
+  (setq! magit-buffer-name-format "%M%v: %t"))
+
+(set-popup-rule! "^\\(?: magit\\)" :ignore t)
 #+end_src
 ** Messages
 *** <q> emacs-buffer/window                                             :hook:
@@ -406,7 +376,7 @@ Why so complicated? [[https://nullprogram.com/blog/2019/12/10/#cl-first]]
 *** Startup options                                                     :setq:
 #+begin_src emacs-lisp
 (after! org
-  (setq! org-tags-column 74
+  (setq! org-tags-column 80
          org-startup-indented t
          org-startup-folded t
          org-startup-truncated t
@@ -453,8 +423,8 @@ Why so complicated? [[https://nullprogram.com/blog/2019/12/10/#cl-first]]
     (defun uki/enable-eldoc-h ()
       "Setup `eldoc-documentation-functions' for elisp."
       (interactive)
-      (add-hook 'eldoc-documentation-functions #'elisp-eldoc-funcall nil t)
-      (add-hook 'eldoc-documentation-functions #'elisp-eldoc-var-docstring nil t)
+      (add-hook! 'eldoc-documentation-functions :local #'elisp-eldoc-funcall)
+      (add-hook! 'eldoc-documentation-functions :local #'elisp-eldoc-var-docstring)
       (eldoc-mode 1))))
 #+end_src
 *** Add Elisp src block template                                        :setq:
@@ -463,17 +433,88 @@ Why so complicated? [[https://nullprogram.com/blog/2019/12/10/#cl-first]]
   (require 'org-tempo)
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")))
 #+end_src
-*** Add timestamps to new headings                                      :hook:
+*** Hugo
+**** TODO Add Hugo properties                                          :bind:defines:
+dodac sprawdzanie czy jestes na odpowiednim poziomie
+#+Begin_src emacs-lisp
+(defcustom uki/default-export-file-name-for-hugo "slug"
+  "Default value of EXPORT_FILE_NAME property for ox-hugo."
+  :group 'uki
+  :type 'string)
+
+;;(defun uki/org-hugo-get-point-of-export-header (&optional property)
+;;  "Returns point value at org headline conteining property EXPORT_FILE_NAME.
+;;Will go up the hierarchy and look at sibiling headlines when searching
+;;for the main one."
+;;  (unless property
+;;    (setq property "EXPORT_FILE_NAME"))
+;;  (save-excursion
+;;    (org-fold-show-set-visibility 'ancestors)
+;;    (unless (org-at-heading-p)
+;;      (outline-up-heading nil t))
+;;    (while (or (not (org-entry-get (point) property nil))
+;;               (and t))
+;;      (outline-up-heading nil t))
+;;    (point)))
+
+(defun uki/org-hugo-set-time-property ()
+  "Set or refresh tree's timestamp."
+  (interactive)
+  (save-excursion
+  (let ((prop (if (org-entry-get (point) "EXPORT_DATE" nil)
+                     "EXPORT_HUGO_LASTMOD"
+                   "EXPORT_DATE")))
+    (org-set-property prop (format-time-string org-hugo-date-format)))))
+
+(defun uki/org-hugo-set-properties ()
+  "Sets properties required by Hugo."
+  (interactive)
+  (save-excursion
+    (let* ((default (or (org-entry-get (point) "EXPORT_FILE_NAME" nil)
+                        uki/default-export-file-name-for-hugo))
+           (slug (if (called-interactively-p 'any)
+                     (read-string
+                      "Enter value for property `EXPORT_FILE_NAME': "
+                      default)
+                   default)))
+      (org-set-property "EXPORT_FILE_NAME" slug))
+    (uki/org-hugo-set-time-property)))
+
+(map! :after org :map org-mode-map
+      :localleader :desc "Set HUGO properties" "H" #'uki/org-hugo-set-properties)
+#+end_src
+**** Use YAML format for generated front matter                        :setq:
 #+begin_src emacs-lisp
-(after! org
-  (add-hook! 'org-insert-heading-hook
-    (defun uki/org-set-created-time ()
-      "Sets CREATED property on the entry giving the creation time.
-If the property already exists, it will not be modified."
-      (interactive)
-      (save-excursion
-        (unless (org-entry-get (point) "CREATED" nil)
-          (org-set-property "CREATED" (format-time-string "[%Y-%m-%d %H:%M]")))))))
+(after! ox-hugo
+  (setq! org-hugo-front-matter-format "yaml"))
+#+end_src
+**** Have emacs do the code-higlighting                                :advice:setq:defines:
+#+begin_src emacs-lisp
+(after! ox-html
+  (setq! org-html-htmlize-output-type 'css
+         org-html-wrap-src-lines t))
+
+(defcustom uki/hugo-code-hilight-use-html t
+  "If t, use emacs syntax highlighting. If nil let Hugo do it's job."
+  :group 'uki
+  :type 'boolean)
+
+(defun uki/hugo-toggle-code-html ()
+  "Toggles `uki/hugo-code-hilight-use-html'."
+  (interactive)
+  (setq! uki/hugo-code-hilight-use-html (not uki/hugo-code-hilight-use-html))
+  (message "Hugo will %suse html for code."
+           (if uki/hugo-code-hilight-use-html "" "not ")))
+
+(defun uki/hugo-code-highlight-a (fn &rest args)
+    "Render HTML, with highlighted code syntax."
+    (require 'ox-html)
+    (if uki/hugo-code-hilight-use-html
+        (apply #'org-html-src-block args)
+      (apply fn args)))
+
+(after! ox-hugo
+  (advice-add #'org-hugo-src-block :around #'uki/hugo-code-highlight-a))
 #+end_src
 ** Info
 *** Automatically view '.info' files instead of editing them            :setq:
@@ -512,44 +553,37 @@ If the property already exists, it will not be modified."
 (setq-hook! 'java-mode-hook
   fill-column 180)
 #+end_src
-*** Load formatter configuration if present
+*** Load formatter configuration if present                             :hook:setq:defines:
 #+begin_src emacs-lisp
-(after! lsp-java
-  (let ((formatter (expand-file-name "~/.formatter.xml")))
+(defun uki/java-setup-formatter-h (&rest _)
+  "Setup lsp java formatter. Reads $FORMATTER_PROFILE for settings profile."
+  (interactive)
+  (require 'lsp-java nil t)
+  (let ((formatter (file-truename "~/.formatter.xml"))
+        (profile (or (getenv "FORMATTER_PROFILE") "default")))
     (if (file-exists-p formatter)
         (setq! lsp-java-format-enabled t
-               lsp-java-format-settings-profile "EKT_Java_Formatter_2"
+               lsp-java-format-settings-profile profile
                lsp-java-format-settings-url formatter)
       (message "No formatter file present: %s" formatter))))
+
+(add-hook! 'java-mode-hook #'uki/java-setup-formatter-h)
 #+end_src
 *** LSP Settings                                                        :setq:
-:PROPERTIES:
-:CREATED:  [2022-08-19 20:19]
-:END:
 #+begin_src emacs-lisp
 (after! lsp-java
-  (setq! lsp-java-java-path (file-truename "/usr/lib/jvm/java-11-openjdk-amd64/bin/java")
+  (setq! lsp-java-java-path "/usr/bin/java"
          lsp-java-dependency-package-representation "hierarchical"
          lsp-java-maven-download-sources t
          lsp-java-references-code-lens-enabled t
+         lsp-java-implementations-code-lens-enabled t
          lsp-java-configuration-maven-user-settings (file-truename "~/.m2/settings.xml")
          lsp-java-code-generation-use-blocks t
          lsp-java-save-actions-organize-imports t))
 #+end_src
 *** Enable eldoc
-:PROPERTIES:
-:CREATED:  [2023-02-04 23:45]
-:END:
 #+begin_src emacs-lisp
 (add-hook! 'java-mode-hook #'uki/enable-eldoc-for-lsp-h)
-#+end_src
-*** Tab width
-:PROPERTIES:
-:CREATED:  [2023-02-05 02:33]
-:END:
-#+begin_src emacs-lisp
-(setq-hook! 'java-mode-hook
-  tab-width 4)
 #+end_src
 ** Compilation
 *** Have <q> exit window                                           :hook:bind:
@@ -567,33 +601,29 @@ If the property already exists, it will not be modified."
 (add-hook! 'comint-mode-hook #'uki/local-remap-q-kills-buffer-h)
 #+end_src
 ** Powershell
-:PROPERTIES:
-:CREATED:  [2023-01-25 19:45]
-:END:
 *** Set lsp exe location                                                :setq:
 TODO: fix: M-x lsp-install-server
-:PROPERTIES:
-:CREATED:  [2023-01-25 19:45]
-:END:
 #+begin_src emacs-lisp
 (after! lsp-pwsh
   (setq! lsp-pwsh-exe (executable-find "powershell.exe")))
 #+end_src
 ** Vterm
-:PROPERTIES:
-:CREATED:  [2023-01-25 20:39]
-:END:
 *** Disable solaire mode                                                :hook:
 When enabled, vterm background is too dark to see dark-blue (filename) color.
-:PROPERTIES:
-:CREATED:  [2023-01-25 20:39]
-:END:
 #+begin_src emacs-lisp
 (add-hook! 'vterm-mode-hook #'turn-off-solaire-mode)
 #+end_src
+* Custom
+** Load
+#+begin_src emacs-lisp
+(load custom-file)
+#+end_src
+** ask about unsaved customizations
+#+begin_src emacs-lisp
+(add-hook! 'kill-emacs-query-functions #'custom-save-all)
+#+end_src
 * Auto tangle & compile
-My =~/.doom.d/config.org= is a softlink, so depending on if I open a symlink or
-concrete file, ~+literate-enable-recompile-h~ might not recognize it as literate config.
+My =~/.doom.d/config.org= is a softlink, so when you edit the file ~+literate-enable-recompile-h~ will not recognize it as literate config.
 
 As a workaround I disable literate autotangle.
 #+begin_src emacs-lisp

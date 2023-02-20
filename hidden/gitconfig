@@ -38,6 +38,7 @@
     prune = fetch --prune
     conflicts = !git diff --name-only --diff-filter=U | sort -u | xargs $EDITOR
     sup = "!f() { git submodule foreach \"git checkout $1 && git pull\"; }; f"
+    optimize = !git reflog expire --all --expire=now && git gc --prune=now --aggressive
 [commit]
     gpgSign = true
 [diff]

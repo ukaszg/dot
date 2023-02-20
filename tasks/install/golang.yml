@@ -3,23 +3,18 @@
   become: false
   vars:
     packages:
-      - github.com/stamblerre/gocode
-      - golang.org/x/tools/gopls
+      - github.com/stamblerre/gocode@latest
+      - golang.org/x/tools/gopls@latest
+      - golang.org/x/tools/cmd/guru@latest
+      - github.com/fatih/gomodifytags@latest
+      - github.com/x-motemen/gore/cmd/gore@latest
       - github.com/cweill/gotests/...
-      - golang.org/x/tools/cmd/guru
-      - github.com/fatih/gomodifytags
-      - github.com/x-motemen/gore/cmd/gore
   tasks:
     - name: Build src/serve.go
       command: go build -ldflags='-s -w' -o ~/bin/serve ~/src/dot/src/serve.go
       changed_when: false
 
     - name: Instal Go tooling for wsl
-      shell: go get -u -ldflags='-s -w' {{ item }}
-      loop: "{{ packages }}"
-      changed_when: false
-
-    - name: Instal Go tooling for windows
-      shell: go.exe install {{ item }}
+      shell: go install -ldflags='-s -w' {{ item }}
       loop: "{{ packages }}"
       changed_when: false

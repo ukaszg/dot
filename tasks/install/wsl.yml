@@ -7,10 +7,9 @@
       - Mozilla.Firefox
       - Microsoft.Skype
       - Valve.Steam
-      - Python.Python.3.8
       - Microsoft.OpenJDK.11
-      - GoLang.Go.1.18
-      - Git.Git
+      - OpenJS.NodeJS.LTS
+      - Microsoft.Git
       - flux.flux
       - TheDocumentFoundation.LibreOffice
   tasks:
