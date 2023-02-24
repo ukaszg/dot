@@ -31,13 +31,6 @@
         update: yes
         version: master
 
-    - name: Link to win home
-      file:
-        src: "{{ userprofile.stdout }}"
-        dest: "{{ ansible_facts['user_dir'] }}/mnt"
-        state: link
-        force: true
-
     - name: Link windows GPG keys to WSL
       file:
         src: "{{ userprofile.stdout }}/.gnupg"
@@ -65,3 +58,4 @@
         groups: docker
         append: yes
       become: true
+

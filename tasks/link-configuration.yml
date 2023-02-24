@@ -96,10 +96,8 @@
         dest: "{{ home }}.local.fish"
 
     - name: Link /etc/wsl.conf
-      file:
+      copy:
         src: "{{ src_dir }}wsl.conf"
         dest: "/etc/wsl.conf"
-        mode: '0644'
-        state: hard
+        mode: '644'
       become: true
-
