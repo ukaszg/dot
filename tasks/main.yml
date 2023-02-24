@@ -1,5 +1,10 @@
 ---
 - import_playbook: link-configuration.yml
-- import_playbook: install/all.yml
+- import_playbook: install/packages.yml
+- import_playbook: install/shell.yml
+- import_playbook: install/npm.yml
+- import_playbook: install/python.yml
+- import_playbook: install/wsl.yml
+- import_playbook: install/golang.yml
 - import_playbook: setup-user.yml
 - import_playbook: emacs.yml

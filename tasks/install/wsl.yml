@@ -7,7 +7,7 @@
       - Mozilla.Firefox
       - Microsoft.Skype
       - Valve.Steam
-      - Microsoft.OpenJDK.11
+      - Microsoft.OpenJDK.17
       - OpenJS.NodeJS.LTS
       - Microsoft.Git
       - flux.flux

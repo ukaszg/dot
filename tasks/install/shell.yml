@@ -1,0 +1,41 @@
+---
+- hosts: all
+  become: false
+  module_defaults:
+    shell:
+      executable: /usr/bin/fish
+  tasks:
+    - name: Install vim-plug for vim
+      shell: mkdir -p ~/.vim/autoload/ && curl -sL https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim | dos2unix | tee ~/.vim/autoload/plug.vim
+      args:
+        creates: ~/.vim/autoload/plug.vim
+        warn: false
+
+    - name: Install fisher for fish
+      shell: curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | dos2unix | source && fisher install jorgebucaran/fisher
+      args:
+        creates: ~/.config/fish/functions/fisher.fish
+        warn: false
+
+    - name: Install colored man pages for fish
+      shell: fisher install decors/fish-colored-man
+      args:
+        creates: ~/.config/fish/functions/man.fish
+
+    - name: Install docker completions for fish
+      shell: fisher install lewisacidic/fish-docker
+      args:
+        creates: ~/.config/fish/completions/docker.fish
+
+    - name: Install sudo completions for fish
+      shell: fisher install eth-p/fish-plugin-sudo
+      args:
+        creates: ~/.config/fish/completions/sudo.fish
+
+    - name: Install nvm for fish
+      shell: fisher install jorgebucaran/nvm.fish
+      args:
+        creates: ~/.config/fish/functions/nvm.fish
+
+    - name: Install new-ish nodejs
+      shell: cd ~ && nvm install 18 && nvm use 18
