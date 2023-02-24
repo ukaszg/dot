@@ -629,7 +629,7 @@ When enabled, vterm background is too dark to see dark-blue (filename) color.
 #+begin_src emacs-lisp
 (load custom-file)
 #+end_src
-** ask about unsaved customizations
+** ask about unsaved customizations on exit
 #+begin_src emacs-lisp
 (add-hook! 'kill-emacs-query-functions #'custom-save-all)
 #+end_src
