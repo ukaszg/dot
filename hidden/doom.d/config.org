@@ -276,7 +276,7 @@ But only in prog & conf mode.
     "Configure and enable `eldoc-mode' using `lsp-mode' features."
     (interactive)
     (require 'eldoc nil t)
-    (add-hook! 'eldoc-documentation-functions :local #'lsp-eldoc-function)
+    (add-hook 'eldoc-documentation-functions #'lsp-eldoc-function -90 t)
     (eldoc-mode 1))
 #+end_src
 ** Desktop-save
@@ -574,9 +574,9 @@ containin property \"EXPORT_FILE_NAME\" or PROPERTY."
   (let ((formatter (file-truename "~/.formatter.xml"))
         (profile (or (getenv "FORMATTER_PROFILE") "default")))
     (if (file-exists-p formatter)
-        (setq! lsp-java-format-enabled t
-               lsp-java-format-settings-profile profile
-               lsp-java-format-settings-url formatter)
+        (setq lsp-java-format-enabled t
+              lsp-java-format-settings-profile profile
+              lsp-java-format-settings-url formatter)
       (message "No formatter file present: %s" formatter))))
 
 (add-hook! 'java-mode-hook #'uki/java-setup-formatter-h)
