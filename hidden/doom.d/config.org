@@ -447,8 +447,7 @@ Why so complicated? [[https://nullprogram.com/blog/2019/12/10/#cl-first]]
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")))
 #+end_src
 *** Hugo
-**** TODO Add Hugo properties                                          :bind:defines:
-dodac sprawdzanie czy jestes na odpowiednim poziomie
+**** Add Hugo properties                                                     :bind:defines:
 #+Begin_src emacs-lisp
 (defcustom uki/default-export-file-name-for-hugo "slug"
   "Default value of EXPORT_FILE_NAME property for ox-hugo."
