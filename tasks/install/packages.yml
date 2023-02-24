@@ -17,18 +17,10 @@
       apt_repository:
         repo: ppa:kelleyk/emacs
 
-    - name: Add Nodesource gpg-key to Ubuntu
-      apt_key:
-        url: "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
-
-    - name: Add nodejs 14.x repository
-      apt_repository:
-        repo: "deb https://deb.nodesource.com/node_16.x {{ ubuntu_version }} main"
-
     - name: Install my packages
       ignore_errors: yes
       apt:
-        update_cache: yes
+        update_cache: no
         force_apt_get: yes
         state: latest
         name:
@@ -56,6 +48,9 @@
           - fonts-terminus
           - glslang-tools
           - git
+          - golang-1.18-go
+          - golang-1.18-src
+          - golang-1.18-doc
           - golang-1.18
           - grep
           - htop
@@ -65,7 +60,6 @@
           - lintian
           - gnutls-bin
           - mc
-          - nodejs
           - pandoc
           - python-is-python3
           - python3-pip
@@ -124,6 +118,21 @@
         executable: /usr/bin/fish
       become: false
 
+    - name: Install nvm for fish
+      shell: fisher install jorgebucaran/nvm.fish
+      args:
+        creates: ~/.config/fish/functions/nvm.fish
+        warn: false
+        executable: /usr/bin/fish
+      become: false
+
+    - name: Install new-ish nodejs
+      shell: cd ~ && nvm install 18 && nvm use 18
+      args:
+        warn: false
+        executable: /usr/bin/fish
+      become: false
+
     - name: Install ripgrep from github
       shell: |
         curl -fLo /tmp/ripgrep.deb {{ ripgrep_url }} && \
@@ -131,4 +140,14 @@
         rm -f /tmp/ripgrep.deb
       args:
         creates: /usr/bin/rg
+        warn: false
+
+    - name: Update go & gofmt alternatives
+      shell: |
+        update-alternatives --install /usr/bin/go go /usr/lib/go-1.18/bin/go 100;
+        update-alternatives --install /usr/bin/gofmt gofmt /usr/lib/go-1.18/bin/gofmt 100;
+      args:
+        creates:
+          - /usr/bin/go
+          - /usr/bin/gofmt
         warn: false

@@ -10,12 +10,17 @@
       - github.com/x-motemen/gore/cmd/gore@latest
       - github.com/cweill/gotests/...
       - mvdan.cc/sh/v3/cmd/shfmt@latest
+    go_opts: -ldflags='-s -w'
   tasks:
     - name: Build src/serve.go
-      command: go build -ldflags='-s -w' -o ~/bin/serve ~/src/dot/src/serve.go
+      command: go build {{ go_opts }} -o ~/bin/serve ~/src/dot/src/serve.go
+      changed_when: false
+
+    - name: Install hugo
+      command: go install {{ go_opts }} -tags extended github.com/gohugoio/hugo@latest
       changed_when: false
 
     - name: Instal Go tooling for wsl
-      shell: go install -ldflags='-s -w' {{ item }}
+      shell: go install {{ go_opts }} {{ item }}
       loop: "{{ packages }}"
       changed_when: false
