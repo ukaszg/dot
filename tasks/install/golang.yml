@@ -9,6 +9,7 @@
       - github.com/fatih/gomodifytags@latest
       - github.com/x-motemen/gore/cmd/gore@latest
       - github.com/cweill/gotests/...
+      - mvdan.cc/sh/v3/cmd/shfmt@latest
   tasks:
     - name: Build src/serve.go
       command: go build -ldflags='-s -w' -o ~/bin/serve ~/src/dot/src/serve.go
