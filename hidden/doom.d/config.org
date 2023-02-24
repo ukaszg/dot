@@ -373,6 +373,19 @@ Why so complicated? [[https://nullprogram.com/blog/2019/12/10/#cl-first]]
   (put 'list-directory 'byte-optimizer 'byte-compile-inline-expand))
 #+end_src
 ** Org
+*** =LIBRARY=
+**** ~uki/org-heading-level~
+#+begin_src emacs-lisp
+(defun uki/org-heading-level ()
+  "Returns level of org headline at point"
+  (car-safe (org-heading-components)))
+#+end_src
+**** ~uki/org-has-property~
+#+begin_src emacs-lisp
+(defun uki/org-has-property (property &optional pos inherit)
+  "If current org entry (under point or POS) has prop PROPERTY."
+  (not (null (org-entry-get (or pos (point)) property inherit))))
+#+end_src
 *** Startup options                                                     :setq:
 #+begin_src emacs-lisp
 (after! org
@@ -442,43 +455,42 @@ dodac sprawdzanie czy jestes na odpowiednim poziomie
   :group 'uki
   :type 'string)
 
-;;(defun uki/org-hugo-get-point-of-export-header (&optional property)
-;;  "Returns point value at org headline conteining property EXPORT_FILE_NAME.
-;;Will go up the hierarchy and look at sibiling headlines when searching
-;;for the main one."
-;;  (unless property
-;;    (setq property "EXPORT_FILE_NAME"))
-;;  (save-excursion
-;;    (org-fold-show-set-visibility 'ancestors)
-;;    (unless (org-at-heading-p)
-;;      (outline-up-heading nil t))
-;;    (while (or (not (org-entry-get (point) property nil))
-;;               (and t))
-;;      (outline-up-heading nil t))
-;;    (point)))
-
-(defun uki/org-hugo-set-time-property ()
-  "Set or refresh tree's timestamp."
-  (interactive)
+(defun uki/org-hugo-get-point-of-export-heading (&optional property)
+  "Returns point value at org headline when headline or it's sibilings
+containin property \"EXPORT_FILE_NAME\" or PROPERTY."
+  (unless property
+    (setq property "EXPORT_FILE_NAME"))
   (save-excursion
-  (let ((prop (if (org-entry-get (point) "EXPORT_DATE" nil)
-                     "EXPORT_HUGO_LASTMOD"
-                   "EXPORT_DATE")))
-    (org-set-property prop (format-time-string org-hugo-date-format)))))
+    (unless (org-at-heading-p)
+      (org-back-to-heading))
+    (while (not (or (uki/org-has-property property)
+                    (eq 1 (uki/org-heading-level))
+                    (seq-contains-p ;;check if sibilings in curr tree have the property
+                     (org-map-entries (lambda () (uki/org-has-property property))
+                                      (format "LEVEL=%d" (uki/org-heading-level))
+                                      'tree)
+                     t)))
+      (org-up-heading-all 1))
+    (point)))
 
 (defun uki/org-hugo-set-properties ()
   "Sets properties required by Hugo."
   (interactive)
   (save-excursion
-    (let* ((default (or (org-entry-get (point) "EXPORT_FILE_NAME" nil)
+    (let* ((ed "EXPORT_DATE")
+           (prop "EXPORT_FILE_NAME")
+           (default (or (org-entry-get (point) prop t)
                         uki/default-export-file-name-for-hugo))
            (slug (if (called-interactively-p 'any)
                      (read-string
                       "Enter value for property `EXPORT_FILE_NAME': "
                       default)
                    default)))
-      (org-set-property "EXPORT_FILE_NAME" slug))
-    (uki/org-hugo-set-time-property)))
+      (unless (uki/org-has-property prop (point) nil)
+        (goto-char (uki/org-hugo-get-point-of-export-heading)))
+      (org-set-property prop slug)
+      (org-set-property (if (uki/org-has-property ed) "EXPORT_HUGO_LASTMOD" ed)
+                        (format-time-string org-hugo-date-format)))))
 
 (map! :after org :map org-mode-map
       :localleader :desc "Set HUGO properties" "H" #'uki/org-hugo-set-properties)
