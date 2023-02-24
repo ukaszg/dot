@@ -60,6 +60,7 @@
           - lintian
           - gnutls-bin
           - mc
+          - openjdk-17-jdk
           - pandoc
           - python-is-python3
           - python3-pip
