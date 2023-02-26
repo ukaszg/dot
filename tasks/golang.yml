@@ -3,13 +3,16 @@
   become: false
   vars:
     packages:
-      - github.com/stamblerre/gocode@latest
-      - golang.org/x/tools/gopls@latest
-      - golang.org/x/tools/cmd/guru@latest
-      - github.com/fatih/gomodifytags@latest
       - github.com/x-motemen/gore/cmd/gore@latest
-      - github.com/cweill/gotests/...
+      - github.com/stamblerre/gocode@latest
+      - golang.org/x/tools/cmd/godoc@latest
+      - golang.org/x/tools/cmd/goimports@latest
+      - golang.org/x/tools/cmd/gorename@latest
+      - golang.org/x/tools/cmd/guru@latest
+      - github.com/cweill/gotests/gotests@latest
+      - github.com/fatih/gomodifytags@latest
       - mvdan.cc/sh/v3/cmd/shfmt@latest
+      #requires go 1.19 #- github.com/golangci/golangci-lint/cmd/golangci-lint@latest
     go_opts: -ldflags='-s -w'
   tasks:
     - name: Build src/serve.go
