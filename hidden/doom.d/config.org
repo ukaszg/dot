@@ -2,7 +2,7 @@
 #+AUTHOR: Łukasz Gruner
 #+EMAIL: lukasz@gruner.lu
 #+DESCRIPTION: Doom Emacs literate config.
-#+TAGS: package(p) advice(a) disabled(d) hook(h) bind(b) setq(s) popup(u) hack(H) defines(D) env(e) command(c)
+#+TAGS: package(p) advice(a) disabled(d) hook(h) bind(b) setq(s) popup(u) hack(H) defines(D) env(e) command(c) mode(m)
 #+PROPERTY: header-args:emacs-lisp :tangle ~/.doom.d/config.el :tangle-mode (identity #o400) :results silent :exports code :lexical yes
 #+TODO: TODO
 #+startup: indent fold
@@ -28,9 +28,9 @@
 #+begin_src emacs-lisp :tangle ~/.doom.d/init.el
 ;;; ~/.doom.d/init.el -*- no-byte-compile: t; lexical-binding: t; -*-
 (doom! :completion (company -tng -childframe) (vertico +icons)
-       :ui         doom hl-todo (modeline +light)
-                   nav-flash ophints (treemacs +lsp) unicode
-                   (popup +all +defaults) (vc-gutter +pretty) vi-tilde-fringe
+       :ui         doom (modeline -light) nav-flash ophints
+                   (treemacs +lsp) unicode (popup +all +defaults)
+                   (vc-gutter +pretty) vi-tilde-fringe
                    (window-select +numbers +switch-window)
        :editor     (evil +everywhere) file-templates fold
                    format snippets word-wrap
@@ -39,7 +39,7 @@
        :checkers   syntax
        :tools      (ansible +lsp) (debugger +lsp) (docker +lsp)
                    editorconfig (eval +overlay)
-                   lookup (lsp +peek) magit make
+                   lookup (lsp -peek) magit make
                    taskrunner terraform tree-sitter
        :os         tty
        :lang       (cc +lsp) data emacs-lisp (go +lsp)
@@ -106,7 +106,7 @@ Some modes don't require macros (like most RO buffers).
 #+begin_src emacs-lisp
 (setq! mouse-1-click-follows-link t)
 #+end_src
-*** Enable ~+global-word-wrap-mode~
+*** Enable ~+global-word-wrap-mode~                                           :mode:
 #+begin_src emacs-lisp
 (+global-word-wrap-mode 1)
 #+end_src
@@ -144,12 +144,6 @@ Some modes don't require macros (like most RO buffers).
 (after! window
   (setq! switch-to-prev-buffer-skip t))
 #+end_src
-** Hl-Todo
-*** Highlight background                                                :setq:
-#+begin_src emacs-lisp
-(after! hl-todo
-  (setq! hl-todo-color-background t))
-#+end_src
 ** Evil
 *** Always use windows <C-w> bindings                                   :setq:
 #+begin_src emacs-lisp
@@ -159,19 +153,31 @@ Some modes don't require macros (like most RO buffers).
 *** Also use arrows for switching windows                               :bind:
 #+begin_src emacs-lisp
 (map! :after evil :map evil-window-map
-      "<left>"  #'evil-window-left
-      "<right>" #'evil-window-right
-      "<up>"    #'evil-window-up
-      "<down>"  #'evil-window-down)
+      :g "<left>"  #'evil-window-left
+      :g "<right>" #'evil-window-right
+      :g "<up>"    #'evil-window-up
+      :g "<down>"  #'evil-window-down)
 #+end_src
 *** Enable =vimish-fold-mode= globally                                  :hook:defines:
-:PROPERTIES:
-:CREATED:  [2023-01-20 16:33]
-:END:
 #+begin_src emacs-lisp
 (add-hook! 'after-init-hook
   (defun uki/enable-vimish-fold-mode-h ()
     (global-evil-vimish-fold-mode 1)))
+#+end_src
+*** Don't continue comments when you <o> or <O> on commented line             :setq:
+#+begin_src emacs-lisp
+(setq! +evil-want-o/O-to-continue-comments nil)
+#+end_src
+*** Don't overwrite clipboard when pasting in visual mode                     :setq:
+#+begin_src emacs-lisp
+(after! evil
+  (setq! evil-kill-on-visual-paste nil))
+#+end_src
+*** Focus treemacs on <C-w p>
+<C-w C-p> is not changed
+#+begin_src emacs-lisp
+(map! :after evil :map evil-window-map
+      :g "p" #'treemacs-select-window)
 #+end_src
 ** Flycheck
 *** Always disable textlint                                             :hook:defines:
@@ -186,71 +192,44 @@ Some modes don't require macros (like most RO buffers).
 *** Settings                                                            :setq:
 #+begin_src emacs-lisp
 (after! lsp
-  (require 'lsp-ui)
-  (setq! lsp-enable-symbol-highlighting nil
-         lsp-ui-doc-enable t
-         lsp-ui-doc-show-with-mouse nil
-         lsp-ui-doc-show-with-cursor nil
+  (setq! lsp-enable-symbol-highlighting t
          lsp-lens-enable t
-         lsp-headerline-breadcrumb-enable nil
-         lsp-ui-sideline-enable t
-         lsp-ui-sidelin-show-code-actions t
-         lsp-ui-sideline-show-hover t))
+         lsp-headerline-breadcrumb-enable nil))
 #+end_src
 ** Treemacs
-:PROPERTIES:
-:CREATED:  [2022-08-19 20:57]
-:END:
-*** Sync with LSP workspace                                             :hook:defines:
+*** Sync with LSP workspace                                                   :mode:
 #+begin_src emacs-lisp
 (after! treemacs
     (lsp-treemacs-sync-mode 1))
 #+end_src
-*** Highlight current file
+*** Highlight current file                                                    :mode:
 #+begin_src emacs-lisp
 (after! treemacs
   (treemacs-follow-mode 1))
 #+end_src
-*** Git mode extended
-:PROPERTIES:
-:CREATED:  [2023-01-27 18:59]
-:END:
+*** Git mode deferred                                                         :setq:
 #+begin_src emacs-lisp
 (setq! +treemacs-git-mode 'deferred)
 #+end_src
+*** Fix popup                                                                 :popup:hack:
+#+begin_src emacs-lisp
+(set-popup-rule! "^ \\*Treemacs-Scoped-Buffer" :modeline nil :side 'left :ignore t)
+#+end_src
 ** Keychain
-:PROPERTIES:
-:CREATED:  [2022-08-22 11:14]
-:END:
-*** Package                                                             :package:
-:PROPERTIES:
-:CREATED:  [2022-08-22 11:14]
-:END:
+*** Package                                                                   :package:
 #+begin_src emacs-lisp :tangle ~/.doom.d/packages.el
 (package! keychain-environment)
 #+end_src
 *** Autostart                                                           :hook:
-:PROPERTIES:
-:CREATED:  [2022-08-22 11:17]
-:END:
 #+begin_src emacs-lisp
 (add-hook! 'after-init-hook #'keychain-refresh-environment)
 #+end_src
 ** Pinentry
-:PROPERTIES:
-:CREATED:  [2022-08-22 11:31]
-:END:
-*** Package                                                             :package:
-:PROPERTIES:
-:CREATED:  [2022-08-22 11:31]
-:END:
+*** Package                                                                   :package:
 #+begin_src emacs-lisp :tangle ~/.doom.d/packages.el
 (package! pinentry)
 #+end_src
 *** Autostart
-:PROPERTIES:
-:CREATED:  [2022-08-22 11:40]
-:END:
 #+begin_src emacs-lisp
 (add-hook! 'after-init-hook #'pinentry-start)
 (add-hook! 'kill-emacs-hook #'pinentry-stop)
@@ -261,38 +240,19 @@ Some modes don't require macros (like most RO buffers).
   (setq! epg-pinentry-mode 'loopback))
 #+end_src
 ** Display-Line-Numbers
-:PROPERTIES:
-:CREATED:  [2023-01-25 21:07]
-:END:
 But only in prog & conf mode.
 #+begin_src emacs-lisp
 (after! display-line-numbers
   (remove-hook! 'text-mode-hook #'display-line-numbers-mode))
 #+end_src
-** Eldoc
-*** TODO Lsp co-op
-#+begin_src emacs-lisp
-(defun uki/enable-eldoc-for-lsp-h ()
-    "Configure and enable `eldoc-mode' using `lsp-mode' features."
-    (interactive)
-    (require 'eldoc nil t)
-    (add-hook 'eldoc-documentation-functions #'lsp-eldoc-function -90 t)
-    (eldoc-mode 1))
-#+end_src
-** Desktop-save
-#+begin_src emacs-lisp
-(add-hook! 'after-init-hook
-  (defun uki/enable-desktop-save-mode-h (&rest _)
-    (desktop-save-mode 1)))
-#+end_src
 * Major-modes
 ** Magit
-*** Never use git wrapper                                               :setq:
+*** Don't use my git wrapper                                                  :setq:
 #+begin_src emacs-lisp
 (after! magit
-  (setq! magit-git-executable (file-truename "/usr/bin/git")))
+  (setq! magit-git-executable "/usr/bin/git"))
 #+end_src
-*** Hide magit buffers from lists                                       :setq:
+*** Hide magit buffers from lists                                             :setq:popup:
 #+begin_src emacs-lisp :tangle no
 (after! magit-mode
   (setq! magit-buffer-name-format "%M%v: %t"))
@@ -586,8 +546,6 @@ containin property \"EXPORT_FILE_NAME\" or PROPERTY."
   (setq! lsp-java-java-path "/usr/bin/java"
          lsp-java-dependency-package-representation "hierarchical"
          lsp-java-maven-download-sources t
-         lsp-java-references-code-lens-enabled t
-         lsp-java-implementations-code-lens-enabled t
          lsp-java-configuration-maven-user-settings (file-truename "~/.m2/settings.xml")
          lsp-java-code-generation-use-blocks t
          lsp-java-save-actions-organize-imports t))
