@@ -28,7 +28,7 @@
 #+begin_src emacs-lisp :tangle ~/.doom.d/init.el
 ;;; ~/.doom.d/init.el -*- no-byte-compile: t; lexical-binding: t; -*-
 (doom! :completion (company -tng -childframe) (vertico +icons)
-       :ui         doom (modeline +light) nav-flash ophints
+       :ui         doom (modeline -light) nav-flash ophints
                    (treemacs +lsp) unicode (popup +all +defaults)
                    (vc-gutter +pretty) vi-tilde-fringe
                    (window-select +numbers +switch-window)
@@ -40,15 +40,15 @@
        :tools      (ansible +lsp) (debugger +lsp) (docker +lsp)
                    editorconfig (eval +overlay)
                    lookup (lsp -peek) magit make
-                   taskrunner terraform tree-sitter
+                   taskrunner terraform ;;tree-sitter
        :os         tty
-       :lang       (cc +lsp +tree-sitter) data emacs-lisp
-                   (go +lsp +tree-sitter) (java +lsp +tree-sitter)
-                   (javascript +lsp +tree-sitter) (json -lsp +tree-sitter)
-                   (lua +lsp +tree-sitter) markdown (org +hugo +dragndrop)
-                   (python +lsp +tree-sitter) rest
-                   (sh +fish -lsp +powershell +tree-sitter)
-                   (web +lsp +tree-sitter) (yaml -lsp +tree-sitter)
+       :lang       (cc +lsp -tree-sitter) data emacs-lisp
+                   (go +lsp -tree-sitter) (java +lsp -tree-sitter)
+                   (javascript +lsp +tree-sitter) (json -lsp -tree-sitter)
+                   (lua +lsp -tree-sitter) markdown (org +hugo +dragndrop)
+                   (python +lsp -tree-sitter) rest
+                   (sh +fish -lsp +powershell -tree-sitter)
+                   (web +lsp -tree-sitter) (yaml -lsp -tree-sitter)
        :config     literate (default +bindings +smartparens))
 #+end_src
 ** My Library of useful things
@@ -57,8 +57,8 @@ Some modes don't require macros (like most RO buffers).
 #+begin_src emacs-lisp
 (defun uki/local-remap-q-kills-buffer-h ()
   "Locally remap <q> to `quit-window'."
-  (define-key evil-normal-state-local-map (kbd "q") #'quit-window)
-  (define-key evil-visual-state-local-map (kbd "q") #'quit-window))
+  (define-key evil-normal-state-local-map (kbd "q") #'+popup/quit-window)
+  (define-key evil-visual-state-local-map (kbd "q") #'+popup/quit-window))
 #+end_src
 *** ~uki/wsl-paste~                                                     :defines:
 #+begin_src emacs-lisp
@@ -248,6 +248,17 @@ But only in prog & conf mode.
 (after! display-line-numbers
   (remove-hook! 'text-mode-hook #'display-line-numbers-mode))
 #+end_src
+** Doom-Modeline
+*** Settings
+#+begin_src emacs-lisp
+(setq doom-modeline-hud t
+      doom-modeline-buffer-file-name-style 'relative-from-project
+      doom-modeline-major-mode-icon t
+      doom-modeline-major-mode-color-icon t
+      doom-modeline-buffer-state-icon t
+      doom-modeline-indent-info t
+      doom-modeline-modal-icon t)
+#+end_src
 * Major-modes
 ** Magit
 *** Don't use my git wrapper                                                  :setq:
@@ -261,6 +272,11 @@ But only in prog & conf mode.
   (setq! magit-buffer-name-format "%M%v: %t"))
 
 (set-popup-rule! "^\\(?: magit\\)" :ignore t)
+#+end_src
+** VC
+*** Don't use my git wrapper                                                  :setq:
+#+begin_src emacs-lisp
+(setq! vc-git-program "/usr/bin/git")
 #+end_src
 ** Messages
 *** <q> emacs-buffer/window                                             :hook:
@@ -410,7 +426,7 @@ Why so complicated? [[https://nullprogram.com/blog/2019/12/10/#cl-first]]
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")))
 #+end_src
 *** Hugo
-**** Add Hugo properties                                                     :bind:defines:
+**** Add Hugo properties                                                     :bind:defines:command:
 #+Begin_src emacs-lisp
 (defcustom uki/default-export-file-name-for-hugo "slug"
   "Default value of EXPORT_FILE_NAME property for ox-hugo."
@@ -434,6 +450,8 @@ containin property \"EXPORT_FILE_NAME\" or PROPERTY."
                      t)))
       (org-up-heading-all 1))
     (point)))
+
+(eval-when-compile (require 'ox-hugo nil t))
 
 (defun uki/org-hugo-set-properties ()
   "Sets properties required by Hugo."
