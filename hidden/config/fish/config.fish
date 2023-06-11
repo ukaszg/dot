@@ -23,6 +23,8 @@ set -x PYTHONDONTWRITEBYTECODE 'True'
 # type gpg password using terminal
 set -x GPG_TTY (tty)
 
+alias winget "winget.exe"
+
 if test -x ~/.local.fish
     . ~/.local.fish
 end
