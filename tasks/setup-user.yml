@@ -30,6 +30,8 @@
         clone: yes
         update: yes
         version: master
+        force: true
+        depth: 1
 
     - name: Link windows GPG keys to WSL
       file:

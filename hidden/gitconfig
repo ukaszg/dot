@@ -2,10 +2,14 @@
     name = Łukasz Gruner
     email = lukasz@gruner.lu
     signingkey = 865929DCF81AAE45
+[commit]
+    gpgSign = true
 [push]
     default = current
     followTags = true
     recurseSubmodules = check
+[pull]
+    autoStash = true
 [rebase]
     autoStash = true
 [merge]
@@ -28,25 +32,13 @@
     fsckobjects = true
 [alias]
     serve = daemon --verbose --export-all --base-path=.git --reuseaddr --strict-paths .git/
-    svnup = !git svn fetch && git svn rebase && git stash pop -q
     st = status
     ci = commit
     co = checkout
-    up = pull --rebase
-    pr = pull --rebase
+    up = pull --autoStash
     glog = log --pretty=format:\"%C(yellow)%h%C(reset) %C(green)%ad%C(reset) %C(red)|%C(reset) %s %C(bold blue)[%an]%C(reset)%C(yellow)%d%C(reset)\" --graph --date=short
-    prune = fetch --prune
     conflicts = !git diff --name-only --diff-filter=U | sort -u | xargs $EDITOR
-    sup = "!f() { git submodule foreach \"git checkout $1 && git pull\"; }; f"
     optimize = !git reflog expire --all --expire=now && git gc --prune=now --aggressive
-[commit]
-    gpgSign = true
-[diff]
-    submodule = log
-[status]
-    submodulesummary = 1
-[submodule]
-    recurse = true
 [include]
     path = ~/.gitconfig.local
 [safe]

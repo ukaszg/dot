@@ -23,7 +23,7 @@
       command: go install {{ go_opts }} -tags extended github.com/gohugoio/hugo@latest
       changed_when: false
 
-    - name: Instal Go tooling for wsl
+    - name: Install Go tooling for wsl
       shell: go install {{ go_opts }} {{ item }}
       loop: "{{ packages }}"
       changed_when: false

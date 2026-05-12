@@ -27,28 +27,28 @@
 ** =MODULES=
 #+begin_src emacs-lisp :tangle ~/.doom.d/init.el
 ;;; ~/.doom.d/init.el -*- no-byte-compile: t; lexical-binding: t; -*-
-(doom! :completion (company -tng -childframe) (vertico +icons)
+(doom! :completion (corfu +orderless) (vertico +icons)
        :ui         doom (modeline -light) nav-flash ophints
-                   (treemacs +lsp) unicode (popup +all +defaults)
+                   neotree unicode (popup +all +defaults)
                    (vc-gutter +pretty) vi-tilde-fringe
                    (window-select +numbers +switch-window)
        :editor     (evil +everywhere) file-templates fold
-                   format snippets word-wrap
-       :emacs      (dired +icons) electric (ibuffer +icons) undo vc
+                   format snippets (whitespace +guess +trim) word-wrap
+       :emacs      (dired +icons) electric (ibuffer +icons) tramp undo vc
        :term       vterm
        :checkers   syntax
        :tools      (ansible +lsp) (debugger +lsp) (docker +lsp)
                    editorconfig (eval +overlay)
                    lookup (lsp -peek) magit make
-                   taskrunner terraform ;;tree-sitter
+                   taskrunner tree-sitter
        :os         tty
-       :lang       (cc +lsp -tree-sitter) data emacs-lisp
-                   (go +lsp -tree-sitter) (java +lsp -tree-sitter)
-                   (javascript +lsp +tree-sitter) (json -lsp -tree-sitter)
-                   (lua +lsp -tree-sitter) markdown (org +hugo +dragndrop)
-                   (python +lsp -tree-sitter) rest
-                   (sh +fish -lsp +powershell -tree-sitter)
-                   (web +lsp -tree-sitter) (yaml -lsp -tree-sitter)
+       :lang       (cc +lsp) (dart +flutter) data emacs-lisp
+                   (go +lsp) (java +lsp)
+                   (javascript +lsp +tree-sitter) (json -lsp)
+                   (lua +lsp) markdown (org +hugo +dragndrop)
+                   (python +lsp) rest
+                   (sh +fish -lsp +powershell)
+                   (web +lsp) (yaml -lsp)
        :config     literate (default +bindings +smartparens))
 #+end_src
 ** My Library of useful things

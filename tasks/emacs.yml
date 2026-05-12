@@ -10,4 +10,5 @@
         clone: yes
         update: yes
         version: master
-
+        single_branch: true
+        depth: 1

@@ -68,12 +68,10 @@
       file:
         src: "{{ userprofile.stdout }}/.m2"
         dest: "{{ home }}.m2"
+        force: true
 
     - name: Copy a new version of .gitconfig to windows
-      copy:
-        src: "{{ hidden_dir }}gitconfig"
-        dest: "{{ userprofile.stdout }}/.gitconfig"
-        force: true
+      shell: "cp {{ hidden_dir }}gitconfig {{ userprofile.stdout }}/.gitconfig"
 
     - name: Ensure .gitconfig.local is present
       file:
@@ -86,14 +84,10 @@
         dest: "{{ home }}.gitconfig.local"
 
     - name: Ensure .local.fish file on windows
-      copy:
-        src: "{{ src_dir }}dot.local.fish.example"
-        dest: "{{ userprofile.stdout }}/.local.fish"
+      shell: "cp {{ src_dir }}dot.local.fish.example {{ userprofile.stdout }}/.local.fish"
 
     - name: Link .local.fish from windows if exists
-      file:
-        src: "{{ userprofile.stdout }}/.local.fish"
-        dest: "{{ home }}.local.fish"
+      shell: "cp {{ userprofile.stdout }}/.local.fish {{ home }}.local.fish"
 
     - name: Link /etc/wsl.conf
       copy:
