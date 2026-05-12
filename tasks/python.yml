@@ -1,26 +1,17 @@
 ---
 - hosts: all
-  module_defaults:
-    pip:
-      extra_args: --user
-      state: latest
   tasks:
-    - name: Install pytest
-      pip: name=pytest
-    - name: Install nose
-      pip: name=nose
-    - name: Install black
-      pip: name=black
-    - name: Install pyflakes
-      pip: name=pyflakes
-    - name: Install isort
-      pip: name=isort
-    - name: Install pipenv
-      pip: name=pipenv
-    - name: Install Cask
+    - name: Install stuff
       shell: |
-          curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python
-          ln -s ~/.cask/bin/cask ~/bin/cask
-      args:
-          warn: no
-          creates: ~/bin/cask
+        python3 -m venv ~/.venv
+        ln -s ~/.venv/bin/python3 ~/bin/python3
+        ln -s ~/.venv/bin/python ~/bin/python
+        ln -s ~/.venv/bin/pip ~/bin/pip
+        ~/.venv/bin/pip install pytest
+        ~/.venv/bin/pip install nose
+        ~/.venv/bin/pip install black
+        ~/.venv/bin/pip install pyflakes
+        ~/.venv/bin/pip install isort
+        ~/.venv/bin/pip install pipenv
+        curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | ~/.venv/bin/python
+        ln -s ~/.cask/bin/cask ~/bin/cask

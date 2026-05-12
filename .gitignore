@@ -5,3 +5,4 @@ ansible.log
 ansible_collections
 .packages
 files/org/site/_out/*
+.idea/
