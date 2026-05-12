@@ -11,8 +11,6 @@
 [pull]
     autoStash = true
 	rebase = false
-[rebase]
-    autoStash = true
 [merge]
     conflictstyle = merge
 [color]
