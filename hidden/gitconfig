@@ -1,7 +1,6 @@
 [user]
     name = Łukasz Gruner
     email = lukasz@gruner.lu
-    signingkey = 865929DCF81AAE45
 [commit]
     gpgSign = false
 [push]
@@ -11,8 +10,6 @@
 [pull]
     autoStash = true
 	rebase = false
-[rebase]
-    autoStash = true
 [merge]
     conflictstyle = merge
 [color]
